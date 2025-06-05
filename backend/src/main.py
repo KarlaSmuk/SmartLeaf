@@ -6,6 +6,7 @@ from controllers.plant import router as plant_router
 from controllers.notification import router as notification_router
 from controllers.sensor_reading import router as sensor_router
 from controllers.watering_event import router as watering_router
+from controllers.user import router as user_router
 
 app = FastAPI()
 
@@ -22,6 +23,8 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(user_router)
+
 app.include_router(plant_router)
 app.include_router(sensor_router)
 app.include_router(notification_router)
