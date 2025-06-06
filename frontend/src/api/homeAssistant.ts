@@ -148,3 +148,38 @@ const airEntities: HAEntity[] = [
     },
 ];
 
+
+export async function updateTresholdAndAutoWatering(entity_id: string, threshold: number, watering: boolean): Promise<void> {
+    // 1. Set moisture threshold
+    const res1 = await fetch(`${HA_URL}/api/services/input_number/set_value`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${HA_TOKEN}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            entity_id: entity_id,
+            value: threshold,
+        }),
+    });
+
+    if (!res1.ok) {
+        throw new Error("Failed to update moisture threshold");
+    }
+
+    // 2. Toggle watering
+    const res2 = await fetch(`${HA_URL}/api/services/input_boolean/turn_${watering ? 'on' : 'off'}`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${HA_TOKEN}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            entity_id: entity_id,
+        }),
+    });
+
+    if (!res2.ok) {
+        throw new Error("Failed to update auto watering");
+    }
+}
