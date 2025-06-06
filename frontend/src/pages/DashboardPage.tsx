@@ -9,68 +9,21 @@ import {
   Chip,
 } from "@mui/material";
 import leafSvg from "../assets/growth-plant.svg";
-import type { HAEntity } from "../api/homeAssistant";
-
-export const mockPlants: HAEntity[] = [
-  {
-    entity_id: "sensor.plant_1_moisture",
-    state: "27",
-    attributes: {
-      friendly_name: "Aloe Vera",
-      moisture: 27,
-      species: "Succulent",
-      moisture_threshold: 30,
-      automation_watering_enabled: true,
-      plant_id: "1",
-      timestamp: "2025-06-05T14:00:00Z",
-    },
-  },
-  {
-    entity_id: "sensor.plant_2_moisture",
-    state: "55",
-    attributes: {
-      friendly_name: "Tomato Plant",
-      moisture: 55,
-      species: "Solanum Lycopersicum",
-      moisture_threshold: 50,
-      automation_watering_enabled: false,
-      plant_id: "2",
-      timestamp: "2025-06-05T14:10:00Z",
-    },
-  },
-];
-
-const airEntities: HAEntity[] = [
-  {
-    entity_id: "sensor.air_temperature",
-    state: "23.1",
-    attributes: {
-      friendly_name: "Room Air Temperature",
-      temperature: 23.1,
-      timestamp: "2025-06-06T08:30:00Z",
-    },
-  },
-  {
-    entity_id: "sensor.air_humidity",
-    state: "45",
-    attributes: {
-      friendly_name: "Room Humidity",
-      humidity: 45,
-      timestamp: "2025-06-06T08:30:00Z",
-    },
-  },
-  {
-    entity_id: "sensor.air_pressure",
-    state: "1015",
-    attributes: {
-      friendly_name: "Room Air Pressure",
-      pressure: 1015,
-      timestamp: "2025-06-06T08:30:00Z",
-    },
-  },
-];
+import { useNavigate } from "react-router-dom";
+import {
+  getMockAirEntities,
+  getMockPlantEntities,
+  getMockSensorAlerts,
+} from "../api/homeAssistant";
 
 function DashboardPage() {
+  const navigate = useNavigate();
+
+  //mock data
+  const airEntities = getMockAirEntities();
+  const plants = getMockPlantEntities();
+  const systemAlerts = getMockSensorAlerts();
+
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
       <Box display="flex" alignItems="center" gap={2} mb={4}>
@@ -109,10 +62,12 @@ function DashboardPage() {
         mt={2}
         justifyContent="flex-start"
       >
-        {mockPlants.map((plant) => (
+        {plants.map((plant) => (
           <Box
+            onClick={() => navigate(`/plant/${plant.entity_id}`)}
             key={plant.entity_id}
             flexBasis={{ xs: "100%", sm: "48%", md: "30%" }}
+            sx={{ cursor: "pointer" }}
           >
             <Card elevation={3} sx={{ height: "100%" }}>
               <CardContent>
@@ -151,9 +106,10 @@ function DashboardPage() {
                   <Button
                     variant="outlined"
                     fullWidth
-                    onClick={() =>
-                      alert(`Trigger watering for ${plant.entity_id}`)
-                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      alert(`Trigger watering for ${plant.entity_id}`);
+                    }}
                   >
                     💧 Manual Watering
                   </Button>
@@ -167,11 +123,63 @@ function DashboardPage() {
       <Box mt={5}>
         <Paper elevation={2} sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            System Logs or Alerts
+            System Alerts
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            No alerts at the moment.
-          </Typography>
+          {systemAlerts.length > 0 ? (
+            systemAlerts.map((alert, index) => {
+              const { type, data } = alert;
+
+              if (type === "watering_event") {
+                return (
+                  <Typography key={index} variant="body2" color="info.main">
+                    💧 {data.message} —{" "}
+                    {new Date(data.timestamp).toLocaleTimeString()}
+                  </Typography>
+                );
+              }
+
+              if (type === "sensor_reading" && data.alert) {
+                const label =
+                  data.alert === "above"
+                    ? "is above the recommended value"
+                    : "is below the recommended value";
+
+                // Add units based on sensor_type
+                let unit = "";
+                switch (data.sensor_type) {
+                  case "temperature":
+                    unit = "°C";
+                    break;
+                  case "humidity":
+                  case "moisture":
+                    unit = "%";
+                    break;
+                  case "pressure":
+                    unit = "hPa";
+                    break;
+                }
+
+                return (
+                  <Typography
+                    key={index}
+                    variant="body2"
+                    color="error"
+                    gutterBottom
+                  >
+                    ⚠️ {data.friendly_name ?? data.sensor_type} {label}:{" "}
+                    {data.value}
+                    {unit} — {new Date(data.timestamp).toLocaleString()}
+                  </Typography>
+                );
+              }
+
+              return null;
+            })
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No alerts at the moment.
+            </Typography>
+          )}
         </Paper>
       </Box>
     </Container>

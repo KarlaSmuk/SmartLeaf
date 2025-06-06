@@ -11,45 +11,35 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useHomeAssistantWebSocket } from "../hooks/useHomeAssistantWebSocket";
+import { getMockPlantEntities } from "../api/homeAssistant";
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const plantId = id ?? "1"; // fallback if not defined
-  const { latest } = useHomeAssistantWebSocket();
+  const plantId = id ?? "sensor.plant_1";
+
+  //mock data
+  const plant = getMockPlantEntities().find((e) => e.entity_id === plantId);
+  //mock sensor readings instead of websocket
+
 
   const [readings, setReadings] = useState<
     { value: number; timestamp: string }[]
-  >([
-    { value: 28, timestamp: "2025-06-05T14:00:00Z" },
-    { value: 31, timestamp: "2025-06-05T13:00:00Z" },
-  ]);
-
+  >([]);
   const [alerts, setAlerts] = useState<
     { id: number; message: string; timestamp: string }[]
-  >([
-    {
-      id: 1,
-      message: "Moisture below threshold!",
-      timestamp: "2025-06-05T14:00:00Z",
-    },
-  ]);
-
-  const moistureThreshold = 30;
+  >([]);
+  const [moistureThreshold, setMoistureThreshold] = useState<number>(30);
 
   useEffect(() => {
-    if (!latest || !latest.data) return;
-    if (latest.data.plant_id && latest.data.plant_id !== plantId) return;
+    if (!plant) return;
 
-    const timestamp = latest.data.timestamp ?? new Date().toISOString();
+    const value = parseFloat(plant.state);
+    const timestamp = new Date().toISOString();
 
-    if (latest.type === "sensor_reading" && latest.data.value !== undefined) {
-      setReadings((prev) => [
-        { value: latest.data.value!, timestamp },
-        ...prev,
-      ]);
+    if (!isNaN(value)) {
+      setReadings((prev) => [{ value, timestamp }, ...prev]);
 
-      if (latest.data.value < moistureThreshold) {
+      if (value < moistureThreshold) {
         setAlerts((prev) => [
           {
             id: Date.now(),
@@ -60,18 +50,7 @@ function PlantDetailPage() {
         ]);
       }
     }
-
-    if (latest.type === "watering_event") {
-      setAlerts((prev) => [
-        {
-          id: Date.now(),
-          message: "Watering started.",
-          timestamp,
-        },
-        ...prev,
-      ]);
-    }
-  }, [latest, plantId]);
+  }, [plant, moistureThreshold]);
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
@@ -81,10 +60,10 @@ function PlantDetailPage() {
         color="success.main"
         gutterBottom
       >
-        Aloe Vera
+        {plant?.attributes.friendly_name ?? "Unknown Plant"}
       </Typography>
       <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        Species: Succulent
+        Species: {plant?.attributes.species ?? "N/A"}
       </Typography>
 
       <Divider sx={{ my: 3 }} />
@@ -97,7 +76,8 @@ function PlantDetailPage() {
           fullWidth
           label="Moisture Threshold (%)"
           type="number"
-          defaultValue={moistureThreshold}
+          value={moistureThreshold}
+          onChange={(e) => setMoistureThreshold(parseFloat(e.target.value))}
           sx={{ mb: 2 }}
         />
         <FormControlLabel
