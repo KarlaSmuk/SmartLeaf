@@ -48,6 +48,22 @@ export const fetchSensorHistory = async (
     }));
 };
 
+export function getMockLeafMoistureHistory() {
+    return mockLeafMoistureHistory;
+}
+
+const mockLeafMoistureHistory = [
+    { timestamp: new Date("2025-05-30T10:00:00Z"), value: 45.2 },
+    { timestamp: new Date("2025-05-31T10:00:00Z"), value: 47.5 },
+    { timestamp: new Date("2025-06-01T10:00:00Z"), value: 42.1 },
+    { timestamp: new Date("2025-06-02T10:00:00Z"), value: 39.8 },
+    { timestamp: new Date("2025-06-03T10:00:00Z"), value: 35.6 },
+    { timestamp: new Date("2025-06-04T10:00:00Z"), value: 31.2 },
+    { timestamp: new Date("2025-06-05T10:00:00Z"), value: 28.9 },
+    { timestamp: new Date("2025-06-06T10:00:00Z"), value: 33.4 }
+];
+
+
 export async function getPlantEntities(): Promise<HAEntity[]> {
     const res = await fetch(`${HA_URL}/api/states`, {
         headers: {

@@ -9,9 +9,22 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
-import { getMockPlantEntities } from "../api/homeAssistant";
+import {
+  getMockLeafMoistureHistory,
+  getMockPlantEntities,
+} from "../api/homeAssistant";
+import { getMockSensorAlerts } from "../hooks/useHomeAssistantWebSocket";
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,36 +34,9 @@ function PlantDetailPage() {
   const plant = getMockPlantEntities().find((e) => e.entity_id === plantId);
   //mock sensor readings instead of websocket
 
-
-  const [readings, setReadings] = useState<
-    { value: number; timestamp: string }[]
-  >([]);
-  const [alerts, setAlerts] = useState<
-    { id: number; message: string; timestamp: string }[]
-  >([]);
+  const historyReadings = getMockLeafMoistureHistory();
+  const systemAlerts = getMockSensorAlerts();
   const [moistureThreshold, setMoistureThreshold] = useState<number>(30);
-
-  useEffect(() => {
-    if (!plant) return;
-
-    const value = parseFloat(plant.state);
-    const timestamp = new Date().toISOString();
-
-    if (!isNaN(value)) {
-      setReadings((prev) => [{ value, timestamp }, ...prev]);
-
-      if (value < moistureThreshold) {
-        setAlerts((prev) => [
-          {
-            id: Date.now(),
-            message: "Moisture below threshold!",
-            timestamp,
-          },
-          ...prev,
-        ]);
-      }
-    }
-  }, [plant, moistureThreshold]);
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
@@ -93,28 +79,113 @@ function PlantDetailPage() {
 
       <Paper sx={{ p: 3, mb: 4 }}>
         <Typography variant="h6" gutterBottom>
-          Recent Readings
+          Leaf Moisture (Last 7 Days)
         </Typography>
-        {readings.map((r, i) => (
-          <Typography key={i} variant="body2">
-            {new Date(r.timestamp).toLocaleString()}: {r.value}%
-          </Typography>
-        ))}
+
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={historyReadings
+              .filter((r) => {
+                const date = new Date(r.timestamp);
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                return date >= sevenDaysAgo;
+              })
+              .sort(
+                (a, b) =>
+                  new Date(a.timestamp).getTime() -
+                  new Date(b.timestamp).getTime()
+              )}
+            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="timestamp"
+              tickFormatter={(str) =>
+                new Date(str).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                })
+              }
+            />
+            <YAxis domain={[0, 100]} unit="%" />
+            <Tooltip
+              labelFormatter={(label) =>
+                new Date(label).toLocaleString("en-GB", {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })
+              }
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke="#2e7d32"
+              strokeWidth={2}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </Paper>
 
       <Paper sx={{ p: 3 }}>
         <Typography variant="h6" gutterBottom>
           Alerts
         </Typography>
-        {alerts.length > 0 ? (
-          alerts.map((a) => (
-            <Typography key={a.id} variant="body2" color="error">
-              ⚠️ {a.message} — {new Date(a.timestamp).toLocaleString()}
-            </Typography>
-          ))
+        {systemAlerts.length > 0 ? (
+          systemAlerts.map((alert, index) => {
+            const { type, data } = alert;
+
+            if (type === "watering_event") {
+              return (
+                <Typography key={index} variant="body2" color="info.main">
+                  💧 {data.message} —{" "}
+                  {new Date(data.timestamp).toLocaleTimeString()}
+                </Typography>
+              );
+            }
+
+            if (type === "sensor_reading" && data.alert) {
+              const label =
+                data.alert === "above"
+                  ? "is above the recommended value"
+                  : "is below the recommended value";
+
+              // Add units based on sensor_type
+              let unit = "";
+              switch (data.sensor_type) {
+                case "temperature":
+                  unit = "°C";
+                  break;
+                case "humidity":
+                case "moisture":
+                  unit = "%";
+                  break;
+                case "pressure":
+                  unit = "hPa";
+                  break;
+              }
+
+              return (
+                <Typography
+                  key={index}
+                  variant="body2"
+                  color="error"
+                  gutterBottom
+                >
+                  ⚠️ {data.friendly_name ?? data.sensor_type} {label}:{" "}
+                  {data.value}
+                  {unit} — {new Date(data.timestamp).toLocaleString()}
+                </Typography>
+              );
+            }
+
+            return null;
+          })
         ) : (
           <Typography variant="body2" color="text.secondary">
-            No alerts.
+            No alerts at the moment.
           </Typography>
         )}
       </Paper>
