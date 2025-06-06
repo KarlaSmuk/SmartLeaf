@@ -1,9 +1,0 @@
-fastapi[standard]
-sqlalchemy
-psycopg2
-alembic
-bcrypt
-passlib[bcrypt]
-python-jose
-pydantic
-python-dotenv

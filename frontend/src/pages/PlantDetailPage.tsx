@@ -1,38 +1,77 @@
-//import { useParams } from "react-router-dom";
 import {
   Container,
   Typography,
-  Box,
-  Paper,
   Divider,
+  Paper,
   TextField,
-  Button,
-  Switch,
   FormControlLabel,
+  Switch,
+  Box,
+  Button,
 } from "@mui/material";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useHomeAssistantWebSocket } from "../hooks/useHomeAssistantWebSocket";
 
-// Example placeholder data (to be replaced with API call)
-const mockPlant = {
-  id: "1",
-  name: "Aloe Vera",
-  species: "Succulent",
-  moisture_threshold: 30,
-  automation_watering_enabled: true,
-  readings: [
+function PlantDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const plantId = id ?? "1"; // fallback if not defined
+  const { latest } = useHomeAssistantWebSocket();
+
+  const [readings, setReadings] = useState<
+    { value: number; timestamp: string }[]
+  >([
     { value: 28, timestamp: "2025-06-05T14:00:00Z" },
     { value: 31, timestamp: "2025-06-05T13:00:00Z" },
-  ],
-  alerts: [
+  ]);
+
+  const [alerts, setAlerts] = useState<
+    { id: number; message: string; timestamp: string }[]
+  >([
     {
       id: 1,
       message: "Moisture below threshold!",
       timestamp: "2025-06-05T14:00:00Z",
     },
-  ],
-};
+  ]);
 
-function PlantDetailPage() {
-  //const { id } = useParams();
+  const moistureThreshold = 30;
+
+  useEffect(() => {
+    if (!latest || !latest.data) return;
+    if (latest.data.plant_id && latest.data.plant_id !== plantId) return;
+
+    const timestamp = latest.data.timestamp ?? new Date().toISOString();
+
+    if (latest.type === "sensor_reading" && latest.data.value !== undefined) {
+      setReadings((prev) => [
+        { value: latest.data.value!, timestamp },
+        ...prev,
+      ]);
+
+      if (latest.data.value < moistureThreshold) {
+        setAlerts((prev) => [
+          {
+            id: Date.now(),
+            message: "Moisture below threshold!",
+            timestamp,
+          },
+          ...prev,
+        ]);
+      }
+    }
+
+    if (latest.type === "watering_event") {
+      setAlerts((prev) => [
+        {
+          id: Date.now(),
+          message: "Watering started.",
+          timestamp,
+        },
+        ...prev,
+      ]);
+    }
+  }, [latest, plantId]);
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
@@ -42,10 +81,10 @@ function PlantDetailPage() {
         color="success.main"
         gutterBottom
       >
-        {mockPlant.name}
+        Aloe Vera
       </Typography>
       <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        Species: {mockPlant.species}
+        Species: Succulent
       </Typography>
 
       <Divider sx={{ my: 3 }} />
@@ -58,13 +97,11 @@ function PlantDetailPage() {
           fullWidth
           label="Moisture Threshold (%)"
           type="number"
-          defaultValue={mockPlant.moisture_threshold}
+          defaultValue={moistureThreshold}
           sx={{ mb: 2 }}
         />
         <FormControlLabel
-          control={
-            <Switch defaultChecked={mockPlant.automation_watering_enabled} />
-          }
+          control={<Switch defaultChecked />}
           label="Enable Auto Watering"
         />
         <Box mt={2}>
@@ -78,7 +115,7 @@ function PlantDetailPage() {
         <Typography variant="h6" gutterBottom>
           Recent Readings
         </Typography>
-        {mockPlant.readings.map((r, i) => (
+        {readings.map((r, i) => (
           <Typography key={i} variant="body2">
             {new Date(r.timestamp).toLocaleString()}: {r.value}%
           </Typography>
@@ -89,8 +126,8 @@ function PlantDetailPage() {
         <Typography variant="h6" gutterBottom>
           Alerts
         </Typography>
-        {mockPlant.alerts.length > 0 ? (
-          mockPlant.alerts.map((a) => (
+        {alerts.length > 0 ? (
+          alerts.map((a) => (
             <Typography key={a.id} variant="body2" color="error">
               ⚠️ {a.message} — {new Date(a.timestamp).toLocaleString()}
             </Typography>
