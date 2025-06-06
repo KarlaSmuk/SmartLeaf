@@ -10,11 +10,8 @@ import {
 } from "@mui/material";
 import leafSvg from "../assets/growth-plant.svg";
 import { useNavigate } from "react-router-dom";
-import {
-  getMockAirEntities,
-  getMockPlantEntities,
-  getMockSensorAlerts,
-} from "../api/homeAssistant";
+import { getMockAirEntities, getMockPlantEntities } from "../api/homeAssistant";
+import { getMockSensorAlerts } from "../hooks/useHomeAssistantWebSocket";
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -22,6 +19,7 @@ function DashboardPage() {
   //mock data
   const airEntities = getMockAirEntities();
   const plants = getMockPlantEntities();
+  //mock sensor alerts instead of websocket
   const systemAlerts = getMockSensorAlerts();
 
   return (

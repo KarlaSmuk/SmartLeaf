@@ -26,19 +26,6 @@ export type HAEntity = {
     };
 };
 
-export type SensorReading = {
-    type: "sensor_reading" | "watering_event";
-    data: {
-        plant_id?: string;
-        sensor_type?: "moisture" | "temperature" | "humidity" | "pressure";
-        value?: number;
-        timestamp: string;
-        message?: string;
-        friendly_name?: string;
-        alert?: "above" | "below";
-    };
-};
-
 export const fetchSensorHistory = async (
     entityId: string,
     fromISO: string
@@ -141,83 +128,6 @@ const airEntities: HAEntity[] = [
             friendly_name: "Room Air Pressure",
             pressure: 1015,
             timestamp: "2025-06-06T08:30:00Z",
-        },
-    },
-];
-
-export function getMockSensorAlerts(): SensorReading[] {
-    return mockSensorAlerts;
-}
-export const mockSensorAlerts: SensorReading[] = [
-    {
-        type: "sensor_reading",
-        data: {
-            plant_id: "1",
-            friendly_name: "Aloe Vera",
-            sensor_type: "moisture",
-            value: 25, // Below threshold (30)
-            timestamp: "2025-06-06T10:00:00Z",
-            alert: "below",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            plant_id: "1",
-            friendly_name: "Aloe Vera",
-            sensor_type: "temperature",
-            value: 35, // Above threshold (30)
-            timestamp: "2025-06-06T10:01:00Z",
-            alert: "above",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            plant_id: "2",
-            friendly_name: "Tomato Plant",
-            sensor_type: "humidity",
-            value: 25, // Below threshold (40)
-            timestamp: "2025-06-06T10:02:00Z",
-            alert: "below",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            sensor_type: "temperature",
-            friendly_name: "Room Temperature",
-            value: 34,
-            timestamp: "2025-06-06T10:10:00Z",
-            alert: "above",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            sensor_type: "humidity",
-            friendly_name: "Room Humidity",
-            value: 30,
-            timestamp: "2025-06-06T10:11:00Z",
-            alert: "below",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            sensor_type: "pressure",
-            friendly_name: "Barometric Pressure",
-            value: 1032,
-            timestamp: "2025-06-06T10:12:00Z",
-            alert: "above",
-        },
-    },
-    {
-        type: "watering_event",
-        data: {
-            plant_id: "1",
-            message: "Watering started",
-            timestamp: "2025-06-06T10:15:00Z",
         },
     },
 ];
