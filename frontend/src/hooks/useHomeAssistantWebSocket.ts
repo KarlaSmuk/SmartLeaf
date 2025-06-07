@@ -33,7 +33,7 @@ const TARGET_ENTITIES = [
 ];
 
 
-type SensorAlert = {
+export type SensorAlert = {
     type: "sensor_reading" | "watering_event";
     data: {
         plant_id?: string;
