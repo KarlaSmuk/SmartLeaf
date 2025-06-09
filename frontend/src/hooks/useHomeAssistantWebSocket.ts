@@ -57,11 +57,15 @@ export function useHomeAssistantWebSocket() {
         socketRef.current = ws;
 
         ws.onopen = () => {
-            ws.send(JSON.stringify({ type: "auth", access_token: HA_TOKEN }));
+            console.log("🔌 WebSocket connected, sending auth");
         };
 
         ws.onmessage = (event) => {
             const msg = JSON.parse(event.data);
+
+            if (msg.type === "auth_required") {
+                ws.send(JSON.stringify({ type: "auth", access_token: HA_TOKEN }));
+            }
 
             if (msg.type === "auth_ok") {
                 ws.send(

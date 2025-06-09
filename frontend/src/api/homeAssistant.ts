@@ -183,3 +183,53 @@ export async function updateTresholdAndAutoWatering(entity_id: string, threshold
         throw new Error("Failed to update auto watering");
     }
 }
+
+export async function getSensorState(entityId: string): Promise<HAEntity> {
+    const res = await fetch(`${HA_URL}/api/states/${entityId}`, {
+        headers: {
+            Authorization: `Bearer ${HA_TOKEN}`,
+            "Content-Type": "application/json",
+        },
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to fetch sensor state for ${entityId}`);
+    }
+
+    return res.json();
+}
+
+export async function updateThreshold(entityId: string, value: number): Promise<void> {
+    const res = await fetch(`${HA_URL}/api/services/input_number/set_value`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${HA_TOKEN}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            entity_id: entityId,
+            value,
+        }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to update threshold for ${entityId}`);
+    }
+}
+
+export async function triggerWatering(scriptEntityId: string): Promise<void> {
+    const res = await fetch(`${HA_URL}/api/services/script/turn_on`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${HA_TOKEN}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            entity_id: scriptEntityId,
+        }),
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to trigger watering script ${scriptEntityId}`);
+    }
+}
