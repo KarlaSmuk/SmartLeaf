@@ -12,8 +12,10 @@ import {
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
+  getMockAirEntities,
   getMockLeafMoistureHistory,
   getMockPlantEntities,
+  updateThreshold,
 } from "../api/homeAssistant";
 import { getMockSensorAlerts } from "../hooks/useHomeAssistantWebSocket";
 import {
@@ -32,11 +34,17 @@ function PlantDetailPage() {
 
   //mock data
   const plant = getMockPlantEntities().find((e) => e.entity_id === plantId);
+  const airEntities = getMockAirEntities();
+
   //mock sensor readings instead of websocket
 
   const historyReadings = getMockLeafMoistureHistory();
   const systemAlerts = getMockSensorAlerts();
   const [moistureThreshold, setMoistureThreshold] = useState<number>(30);
+  const [tempMinTreshold, setTempMinTreshold] = useState<number>(30);
+  const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(50);
+  const [humidityThreshold, setHumidityThreshold] = useState<number>(30);
+  const [pressureThreshold, setPressureThreshold] = useState<number>(30);
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
@@ -48,11 +56,132 @@ function PlantDetailPage() {
       >
         {plant?.attributes.friendly_name ?? "Unknown Plant"}
       </Typography>
-      <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        Species: {plant?.attributes.species ?? "N/A"}
-      </Typography>
 
       <Divider sx={{ my: 3 }} />
+
+      <Paper sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          🌬️ Environmental Conditions
+        </Typography>
+        <Typography variant="body2">
+          🌡️ {airEntities[0]?.attributes.friendly_name ?? "-"}:{" "}
+          {airEntities[0]?.attributes.temperature ?? "-"} °C
+        </Typography>
+        <Typography variant="body2">
+          💧 {airEntities[1]?.attributes.friendly_name ?? "-"}:{" "}
+          {airEntities[1]?.attributes.humidity ?? "-"} %
+        </Typography>
+        <Typography variant="body2">
+          📈 {airEntities[2]?.attributes.friendly_name ?? "-"}:{" "}
+          {airEntities[2]?.attributes.pressure ?? "-"} hPa
+        </Typography>
+
+        <Box sx={{ display: "flex", flexWrap: "wrap", mt: 2 }}>
+          <Box
+            sx={{ display: "flex", alignItems: "baseline" }}
+            display={"flex"}
+            flexDirection={"column"}
+          >
+            <Typography variant="h6" gutterBottom>
+              Room temperature threshold
+            </Typography>
+
+            <Box display={"flex"} flexDirection="column">
+              <Box sx={{ display: "flex", alignItems: "baseline" }}>
+                <TextField
+                  fullWidth
+                  label="Min Threshold (°C)"
+                  type="number"
+                  value={tempMinTreshold}
+                  onChange={(e) =>
+                    setTempMinTreshold(parseFloat(e.target.value))
+                  }
+                  sx={{ mb: 2, width: "180px" }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    updateThreshold("input_number.", tempMinTreshold);
+                  }}
+                  sx={{ ml: 2 }}
+                >
+                  Save
+                </Button>
+              </Box>
+
+              <Box sx={{ mt: 3, display: "flex", alignItems: "baseline" }}>
+                <TextField
+                  fullWidth
+                  label="Max Threshold (°C)"
+                  type="number"
+                  value={tempMaxTreshold}
+                  onChange={(e) =>
+                    setTempMaxTreshold(parseFloat(e.target.value))
+                  }
+                  sx={{ width: "180px", gap: 2 }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    updateThreshold("input_number.", tempMaxTreshold);
+                  }}
+                  sx={{ ml: 2 }}
+                >
+                  Save
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: "flex", alignItems: "baseline" }}>
+            <TextField
+              fullWidth
+              label="Humidity Threshold (%)"
+              type="number"
+              value={humidityThreshold}
+              onChange={(e) => setHumidityThreshold(parseFloat(e.target.value))}
+              sx={{ mb: 2, width: "180px", height: "10px" }}
+            />
+            <Box>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  updateThreshold("input_number.", humidityThreshold);
+                }}
+                sx={{ ml: 2 }}
+              >
+                Save
+              </Button>
+            </Box>
+          </Box>
+
+          <Box sx={{ mt: 3, display: "flex", alignItems: "baseline" }}>
+            <TextField
+              fullWidth
+              label="Humidity Threshold (hPa)"
+              type="number"
+              value={pressureThreshold}
+              onChange={(e) => setPressureThreshold(parseFloat(e.target.value))}
+              sx={{ mb: 2, width: "200px", height: "10px" }}
+            />
+            <Box>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  updateThreshold("input_number.", pressureThreshold);
+                }}
+                sx={{ ml: 2 }}
+              >
+                Save
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Paper>
 
       <Paper sx={{ p: 3, mb: 4 }}>
         <Typography variant="h6" gutterBottom>
@@ -71,7 +200,16 @@ function PlantDetailPage() {
           label="Enable Auto Watering"
         />
         <Box mt={2}>
-          <Button variant="contained" color="primary">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              updateThreshold(
+                "input_number.plant1_moisture_threshold",
+                moistureThreshold
+              );
+            }}
+          >
             Save Settings
           </Button>
         </Box>

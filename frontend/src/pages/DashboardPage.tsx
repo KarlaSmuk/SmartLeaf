@@ -10,14 +10,13 @@ import {
 } from "@mui/material";
 import leafSvg from "../assets/growth-plant.svg";
 import { useNavigate } from "react-router-dom";
-import { getMockAirEntities, getMockPlantEntities } from "../api/homeAssistant";
+import { getMockPlantEntities, triggerWatering } from "../api/homeAssistant";
 import { getMockSensorAlerts } from "../hooks/useHomeAssistantWebSocket";
 
 function DashboardPage() {
   const navigate = useNavigate();
 
   //mock data
-  const airEntities = getMockAirEntities();
   const plants = getMockPlantEntities();
   //mock sensor alerts instead of websocket
   const systemAlerts = getMockSensorAlerts();
@@ -34,24 +33,6 @@ function DashboardPage() {
       <Typography variant="subtitle1" color="text.secondary" gutterBottom>
         Monitor all your plants below.
       </Typography>
-
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          🌬️ Environmental Conditions
-        </Typography>
-        <Typography variant="body2">
-          🌡️ {airEntities[0]?.attributes.friendly_name ?? "-"}:{" "}
-          {airEntities[0]?.attributes.temperature ?? "-"} °C
-        </Typography>
-        <Typography variant="body2">
-          💧 {airEntities[1]?.attributes.friendly_name ?? "-"}:{" "}
-          {airEntities[1]?.attributes.humidity ?? "-"} %
-        </Typography>
-        <Typography variant="body2">
-          📈 {airEntities[2]?.attributes.friendly_name ?? "-"}:{" "}
-          {airEntities[2]?.attributes.pressure ?? "-"} hPa
-        </Typography>
-      </Paper>
 
       <Box
         display="flex"
@@ -106,7 +87,7 @@ function DashboardPage() {
                     fullWidth
                     onClick={(e) => {
                       e.stopPropagation();
-                      alert(`Trigger watering for ${plant.entity_id}`);
+                      triggerWatering(plant.entity_id);
                     }}
                   >
                     💧 Manual Watering

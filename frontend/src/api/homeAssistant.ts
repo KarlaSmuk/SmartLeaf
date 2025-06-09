@@ -217,7 +217,7 @@ export async function updateThreshold(entityId: string, value: number): Promise<
     }
 }
 
-export async function triggerWatering(scriptEntityId: string): Promise<void> {
+export async function triggerWatering(entityId: string): Promise<void> {
     const res = await fetch(`${HA_URL}/api/services/script/turn_on`, {
         method: "POST",
         headers: {
@@ -225,11 +225,11 @@ export async function triggerWatering(scriptEntityId: string): Promise<void> {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            entity_id: scriptEntityId,
+            entity_id: entityId,
         }),
     });
 
     if (!res.ok) {
-        throw new Error(`Failed to trigger watering script ${scriptEntityId}`);
+        throw new Error(`Failed to trigger watering script ${entityId}`);
     }
 }
