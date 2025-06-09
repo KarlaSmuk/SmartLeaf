@@ -76,14 +76,14 @@ function PlantDetailPage() {
           {airEntities[2]?.attributes.pressure ?? "-"} hPa
         </Typography>
 
-        <Box sx={{ display: "flex", flexWrap: "wrap", mt: 2 }}>
+        <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap", mt: 2 }}>
           <Box
             sx={{ display: "flex", alignItems: "baseline" }}
             display={"flex"}
             flexDirection={"column"}
           >
-            <Typography variant="h6" gutterBottom>
-              Room temperature threshold
+            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+              Room Temperature Threshold
             </Typography>
 
             <Box display={"flex"} flexDirection="column">
@@ -96,7 +96,7 @@ function PlantDetailPage() {
                   onChange={(e) =>
                     setTempMinTreshold(parseFloat(e.target.value))
                   }
-                  sx={{ mb: 2, width: "180px" }}
+                  sx={{ width: "180px" }}
                 />
                 <Button
                   variant="contained"
@@ -135,16 +135,21 @@ function PlantDetailPage() {
             </Box>
           </Box>
 
-          <Box sx={{ display: "flex", alignItems: "baseline" }}>
-            <TextField
-              fullWidth
-              label="Humidity Threshold (%)"
-              type="number"
-              value={humidityThreshold}
-              onChange={(e) => setHumidityThreshold(parseFloat(e.target.value))}
-              sx={{ mb: 2, width: "180px", height: "10px" }}
-            />
-            <Box>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+              Room Humidity Threshold
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "baseline" }}>
+              <TextField
+                fullWidth
+                label="Humidity Threshold (%)"
+                type="number"
+                value={humidityThreshold}
+                onChange={(e) =>
+                  setHumidityThreshold(parseFloat(e.target.value))
+                }
+                sx={{ width: "180px", height: "10px" }}
+              />
               <Button
                 variant="contained"
                 color="primary"
@@ -157,17 +162,21 @@ function PlantDetailPage() {
               </Button>
             </Box>
           </Box>
-
-          <Box sx={{ mt: 3, display: "flex", alignItems: "baseline" }}>
-            <TextField
-              fullWidth
-              label="Humidity Threshold (hPa)"
-              type="number"
-              value={pressureThreshold}
-              onChange={(e) => setPressureThreshold(parseFloat(e.target.value))}
-              sx={{ mb: 2, width: "200px", height: "10px" }}
-            />
-            <Box>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+              Room Air Pressure Threshold
+            </Typography>
+            <Box sx={{ display: "flex", alignItems: "baseline" }}>
+              <TextField
+                fullWidth
+                label="Air Pressure Threshold (hPa)"
+                type="number"
+                value={pressureThreshold}
+                onChange={(e) =>
+                  setPressureThreshold(parseFloat(e.target.value))
+                }
+                sx={{ mb: 2, width: "200px", height: "10px" }}
+              />
               <Button
                 variant="contained"
                 color="primary"
