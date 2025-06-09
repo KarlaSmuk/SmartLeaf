@@ -48,25 +48,21 @@ function DashboardPage() {
             flexBasis={{ xs: "100%", sm: "48%", md: "30%" }}
             sx={{ cursor: "pointer" }}
           >
-            <Card elevation={3} sx={{ height: "100%" }}>
+            <Card
+              elevation={3}
+              sx={{
+                height: "100%",
+                transition: "box-shadow 0.3s ease-in-out",
+                "&:hover": {
+                  boxShadow: 6,
+                },
+              }}
+            >
               <CardContent>
-                <Typography variant="h6" color="success.main" gutterBottom>
+                <Typography variant="h5" color="success.main" gutterBottom>
                   {plant.attributes.friendly_name ?? plant.entity_id}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Species: {plant.attributes.species ?? "N/A"}
-                </Typography>
-                <Typography variant="body2">
-                  Moisture threshold:{" "}
-                  {plant.attributes.moisture_threshold ?? "N/A"}%
-                </Typography>
-                <Typography variant="body2">
-                  Last reading: {plant.attributes.moisture ?? "N/A"}% at{" "}
-                  {plant.attributes.timestamp
-                    ? new Date(plant.attributes.timestamp).toLocaleTimeString()
-                    : "N/A"}
-                </Typography>
-                <Box mt={1}>
+                <Box mt={2}>
                   <Chip
                     label={
                       plant.attributes.automation_watering_enabled

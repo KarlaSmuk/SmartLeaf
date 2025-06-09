@@ -15,6 +15,7 @@ import {
   getMockAirEntities,
   getMockLeafMoistureHistory,
   getMockPlantEntities,
+  triggerWatering,
   updateThreshold,
 } from "../api/homeAssistant";
 import { getMockSensorAlerts } from "../hooks/useHomeAssistantWebSocket";
@@ -30,10 +31,12 @@ import {
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const plantId = id ?? "sensor.plant_1";
+  const plantEntityId = id ?? "sensor.plant_1";
 
   //mock data
-  const plant = getMockPlantEntities().find((e) => e.entity_id === plantId);
+  const plant = getMockPlantEntities().find(
+    (e) => e.entity_id === plantEntityId
+  );
   const airEntities = getMockAirEntities();
 
   //mock sensor readings instead of websocket
@@ -56,6 +59,17 @@ function PlantDetailPage() {
       >
         {plant?.attributes.friendly_name ?? "Unknown Plant"}
       </Typography>
+
+      <Button
+        variant="outlined"
+        sx={{ mt: 2 }}
+        onClick={(e) => {
+          e.stopPropagation();
+          triggerWatering(plantEntityId);
+        }}
+      >
+        💧 Manual Watering
+      </Button>
 
       <Divider sx={{ my: 3 }} />
 
