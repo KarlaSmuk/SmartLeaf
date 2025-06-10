@@ -15,7 +15,6 @@ export type HAEntity = {
         timestamp?: string;
         // for plant entities
         plant_id?: string;
-        species?: string;
         moisture_threshold?: number;
         automation_watering_enabled?: boolean;
         moisture?: number;
@@ -92,7 +91,6 @@ const mockPlants: HAEntity[] = [
         attributes: {
             friendly_name: "Aloe Vera",
             moisture: 27,
-            species: "Succulent",
             moisture_threshold: 30,
             automation_watering_enabled: true,
             plant_id: "1",
@@ -105,7 +103,6 @@ const mockPlants: HAEntity[] = [
         attributes: {
             friendly_name: "Tomato Plant",
             moisture: 55,
-            species: "Solanum Lycopersicum",
             moisture_threshold: 50,
             automation_watering_enabled: false,
             plant_id: "2",
@@ -147,42 +144,6 @@ const airEntities: HAEntity[] = [
         },
     },
 ];
-
-
-export async function updateTresholdAndAutoWatering(entity_id: string, threshold: number, watering: boolean): Promise<void> {
-    // 1. Set moisture threshold
-    const res1 = await fetch(`${HA_URL}/api/services/input_number/set_value`, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${HA_TOKEN}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            entity_id: entity_id,
-            value: threshold,
-        }),
-    });
-
-    if (!res1.ok) {
-        throw new Error("Failed to update moisture threshold");
-    }
-
-    // 2. Toggle watering
-    const res2 = await fetch(`${HA_URL}/api/services/input_boolean/turn_${watering ? 'on' : 'off'}`, {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${HA_TOKEN}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            entity_id: entity_id,
-        }),
-    });
-
-    if (!res2.ok) {
-        throw new Error("Failed to update auto watering");
-    }
-}
 
 export async function getSensorState(entityId: string): Promise<HAEntity> {
     const res = await fetch(`${HA_URL}/api/states/${entityId}`, {

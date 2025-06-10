@@ -8,6 +8,8 @@ import {
   Switch,
   Box,
   Button,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -74,43 +76,56 @@ function PlantDetailPage() {
       <Divider sx={{ my: 3 }} />
 
       <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
-          🌬️ Environmental Conditions
-        </Typography>
-        <Typography variant="body2">
-          🌡️ {airEntities[0]?.attributes.friendly_name ?? "-"}:{" "}
-          {airEntities[0]?.attributes.temperature ?? "-"} °C
-        </Typography>
-        <Typography variant="body2">
-          💧 {airEntities[1]?.attributes.friendly_name ?? "-"}:{" "}
-          {airEntities[1]?.attributes.humidity ?? "-"} %
-        </Typography>
-        <Typography variant="body2">
-          📈 {airEntities[2]?.attributes.friendly_name ?? "-"}:{" "}
-          {airEntities[2]?.attributes.pressure ?? "-"} hPa
+        <Card sx={{ px: 2, py: 2, borderRadius: 2, boxShadow: 3 }}>
+          <CardContent>
+            <Typography variant="h5" gutterBottom>
+              Environmental Conditions
+            </Typography>
+
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                🌡️ {"Temperature"}:{" "}
+                {airEntities[0]?.attributes.temperature ?? "-"} °C
+              </Typography>
+
+              <Typography variant="body1" sx={{ mb: 1 }}>
+                💧 {"Humidity"}: {airEntities[1]?.attributes.humidity ?? "-"} %
+              </Typography>
+
+              <Typography variant="body1">
+                📈 {"Pressure"}: {airEntities[2]?.attributes.pressure ?? "-"}{" "}
+                hPa
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
+
+        <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+          Configure Your Environment
         </Typography>
 
-        <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap", mt: 2 }}>
+        <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           <Box
             sx={{ display: "flex", alignItems: "baseline" }}
             display={"flex"}
             flexDirection={"column"}
           >
-            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-              Room Temperature Threshold
+            <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
+              Temperature Threshold
             </Typography>
 
             <Box display={"flex"} flexDirection="column">
               <Box sx={{ display: "flex", alignItems: "baseline" }}>
                 <TextField
                   fullWidth
-                  label="Min Threshold (°C)"
+                  label="Min Temp (°C)"
                   type="number"
                   value={tempMinTreshold}
                   onChange={(e) =>
                     setTempMinTreshold(parseFloat(e.target.value))
                   }
-                  sx={{ width: "180px" }}
+                  sx={{ width: 120 }}
+                  size="small"
                 />
                 <Button
                   variant="contained"
@@ -119,6 +134,7 @@ function PlantDetailPage() {
                     updateThreshold("input_number.", tempMinTreshold);
                   }}
                   sx={{ ml: 2 }}
+                  size="small"
                 >
                   Save
                 </Button>
@@ -127,13 +143,14 @@ function PlantDetailPage() {
               <Box sx={{ mt: 3, display: "flex", alignItems: "baseline" }}>
                 <TextField
                   fullWidth
-                  label="Max Threshold (°C)"
+                  label="Max Temp (°C)"
                   type="number"
                   value={tempMaxTreshold}
                   onChange={(e) =>
                     setTempMaxTreshold(parseFloat(e.target.value))
                   }
-                  sx={{ width: "180px", gap: 2 }}
+                  sx={{ width: 120 }}
+                  size="small"
                 />
                 <Button
                   variant="contained"
@@ -142,6 +159,7 @@ function PlantDetailPage() {
                     updateThreshold("input_number.", tempMaxTreshold);
                   }}
                   sx={{ ml: 2 }}
+                  size="small"
                 >
                   Save
                 </Button>
@@ -150,19 +168,20 @@ function PlantDetailPage() {
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-              Room Humidity Threshold
+            <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
+              Humidity Threshold
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline" }}>
               <TextField
                 fullWidth
-                label="Humidity Threshold (%)"
+                label="Humidity (%)"
                 type="number"
                 value={humidityThreshold}
                 onChange={(e) =>
                   setHumidityThreshold(parseFloat(e.target.value))
                 }
-                sx={{ width: "180px", height: "10px" }}
+                sx={{ width: 120 }}
+                size="small"
               />
               <Button
                 variant="contained"
@@ -171,25 +190,27 @@ function PlantDetailPage() {
                   updateThreshold("input_number.", humidityThreshold);
                 }}
                 sx={{ ml: 2 }}
+                size="small"
               >
                 Save
               </Button>
             </Box>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
-              Room Air Pressure Threshold
+            <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
+              Air Pressure Threshold
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline" }}>
               <TextField
                 fullWidth
-                label="Air Pressure Threshold (hPa)"
+                label="Pressure (hPa)"
                 type="number"
                 value={pressureThreshold}
                 onChange={(e) =>
                   setPressureThreshold(parseFloat(e.target.value))
                 }
-                sx={{ mb: 2, width: "200px", height: "10px" }}
+                sx={{ width: 120 }}
+                size="small"
               />
               <Button
                 variant="contained"
@@ -198,6 +219,7 @@ function PlantDetailPage() {
                   updateThreshold("input_number.", pressureThreshold);
                 }}
                 sx={{ ml: 2 }}
+                size="small"
               >
                 Save
               </Button>
@@ -207,22 +229,18 @@ function PlantDetailPage() {
       </Paper>
 
       <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
           Plant Settings
         </Typography>
-        <TextField
-          fullWidth
-          label="Moisture Threshold (%)"
-          type="number"
-          value={moistureThreshold}
-          onChange={(e) => setMoistureThreshold(parseFloat(e.target.value))}
-          sx={{ mb: 2 }}
-        />
-        <FormControlLabel
-          control={<Switch defaultChecked />}
-          label="Enable Auto Watering"
-        />
-        <Box mt={2}>
+        <Box display={"flex"} sx={{ mb: 2 }} alignItems={"baseline"} gap={2}>
+          <TextField
+            fullWidth
+            label="Moisture Threshold (%)"
+            type="number"
+            value={moistureThreshold}
+            onChange={(e) => setMoistureThreshold(parseFloat(e.target.value))}
+            sx={{ width: 400 }}
+          />
           <Button
             variant="contained"
             color="primary"
@@ -233,13 +251,17 @@ function PlantDetailPage() {
               );
             }}
           >
-            Save Settings
+            Save
           </Button>
         </Box>
+        <FormControlLabel
+          control={<Switch defaultChecked />}
+          label="Enable Auto Watering"
+        />
       </Paper>
 
       <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           Leaf Moisture (Last 7 Days)
         </Typography>
 
@@ -291,7 +313,7 @@ function PlantDetailPage() {
       </Paper>
 
       <Paper sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h5" gutterBottom>
           Alerts
         </Typography>
         {systemAlerts.length > 0 ? (
