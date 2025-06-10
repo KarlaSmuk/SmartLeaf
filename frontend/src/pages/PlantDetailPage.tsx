@@ -316,61 +316,63 @@ function PlantDetailPage() {
         <Typography variant="h5" gutterBottom>
           Alerts
         </Typography>
-        {systemAlerts.length > 0 ? (
-          systemAlerts.map((alert, index) => {
-            const { type, data } = alert;
+        <Box display={"grid"} gap={"5px"}>
+          {systemAlerts.length > 0 ? (
+            systemAlerts.map((alert, index) => {
+              const { type, data } = alert;
 
-            if (type === "watering_event") {
-              return (
-                <Typography key={index} variant="body2" color="info.main">
-                  💧 {data.message} —{" "}
-                  {new Date(data.timestamp).toLocaleTimeString()}
-                </Typography>
-              );
-            }
-
-            if (type === "sensor_reading" && data.alert) {
-              const label =
-                data.alert === "above"
-                  ? "is above the recommended value"
-                  : "is below the recommended value";
-
-              // Add units based on sensor_type
-              let unit = "";
-              switch (data.sensor_type) {
-                case "temperature":
-                  unit = "°C";
-                  break;
-                case "humidity":
-                case "moisture":
-                  unit = "%";
-                  break;
-                case "pressure":
-                  unit = "hPa";
-                  break;
+              if (type === "watering_event") {
+                return (
+                  <Typography key={index} variant="body1" color="info.main">
+                    💧 {data.message} —{" "}
+                    {new Date(data.timestamp).toLocaleTimeString()}
+                  </Typography>
+                );
               }
 
-              return (
-                <Typography
-                  key={index}
-                  variant="body2"
-                  color="error"
-                  gutterBottom
-                >
-                  ⚠️ {data.friendly_name ?? data.sensor_type} {label}:{" "}
-                  {data.value}
-                  {unit} — {new Date(data.timestamp).toLocaleString()}
-                </Typography>
-              );
-            }
+              if (type === "sensor_reading" && data.alert) {
+                const label =
+                  data.alert === "above"
+                    ? "is above the recommended value"
+                    : "is below the recommended value";
 
-            return null;
-          })
-        ) : (
-          <Typography variant="body2" color="text.secondary">
-            No alerts at the moment.
-          </Typography>
-        )}
+                // Add units based on sensor_type
+                let unit = "";
+                switch (data.sensor_type) {
+                  case "temperature":
+                    unit = "°C";
+                    break;
+                  case "humidity":
+                  case "moisture":
+                    unit = "%";
+                    break;
+                  case "pressure":
+                    unit = "hPa";
+                    break;
+                }
+
+                return (
+                  <Typography
+                    key={index}
+                    variant="body1"
+                    color="error"
+                    gutterBottom
+                  >
+                    ⚠️ {data.friendly_name ?? data.sensor_type} {label}:{" "}
+                    {data.value}
+                    {unit} — {new Date(data.timestamp).toLocaleString()}
+                  </Typography>
+                );
+              }
+
+              return null;
+            })
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No alerts at the moment.
+            </Typography>
+          )}
+        </Box>
       </Paper>
     </Container>
   );

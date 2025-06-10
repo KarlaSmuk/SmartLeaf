@@ -77,7 +77,7 @@ export function useHomeAssistantWebSocket() {
                 );
             }
 
-            if (msg.type === "event" && msg.event?.data?.entity_id) {
+            if (msg.type === "event") {
                 const eventMsg = msg as HAWebSocketEvent;
                 const { entity_id, new_state } = eventMsg.event.data;
 
