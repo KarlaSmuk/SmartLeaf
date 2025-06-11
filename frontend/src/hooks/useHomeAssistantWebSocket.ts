@@ -11,26 +11,18 @@ type HAWebSocketEvent = {
             old_state: any;
             new_state: {
                 state: string;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                attributes: Record<string, any>;
-                last_changed: string;
+                attributes: {
+                    unit_of_measurement?: string;
+                    friendly_name?: string;
+                };
                 last_updated: string;
             };
         };
-        origin: string;
-        time_fired: string;
     };
 };
 
 const HA_URL = import.meta.env.VITE_HA_URL;
 const HA_TOKEN = import.meta.env.VITE_HA_TOKEN;
-
-const TARGET_ENTITIES = [
-    "sensor.air_temperature",
-    "sensor.air_humidity",
-    "sensor.air_pressure",
-    "sensor.leaf_moisture",
-];
 
 
 export type SensorAlert = {
@@ -38,18 +30,18 @@ export type SensorAlert = {
     data: {
         plant_id?: string;
         sensor_type?: SensorType;
-        value?: number;
+        state?: string;
+        unit_of_measurement?: string;
         timestamp: string;
         message?: string;
         friendly_name?: string;
-        alert?: "above" | "below";
     };
 };
 
 type SensorType = "moisture" | "temperature" | "humidity" | "pressure";
 
 export function useHomeAssistantWebSocket() {
-    const [latestAlerts, setLatestAlerts] = useState<SensorAlert | null>(null);
+    const [latestAlert, setLatestAlert] = useState<SensorAlert | null>(null);
     const socketRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -80,35 +72,26 @@ export function useHomeAssistantWebSocket() {
             if (msg.type === "event") {
                 const eventMsg = msg as HAWebSocketEvent;
                 const { entity_id, new_state } = eventMsg.event.data;
+                if (entity_id.startsWith("automation.")) {
+                    console.log(msg)
 
-                if (TARGET_ENTITIES.includes(entity_id)) {
-                    const value = parseFloat(new_state.state);
-                    const plantId = new_state.attributes?.plant_id;
-                    const friendly_name = new_state.attributes?.friendly_name;
-                    const timestamp = eventMsg.event.time_fired;
-                    const alert = new_state.attributes.alert; // "above" or "below"
-                    // Optional: map entity_id to sensor_type
-                    const ENTITY_TYPE_MAP: Record<string, SensorType> = {
-                        "sensor.air_temperature": "temperature",
-                        "sensor.air_humidity": "humidity",
-                        "sensor.air_pressure": "pressure",
-                        "sensor.leaf_moisture": "moisture",
-                    };
-                    const sensor_type = ENTITY_TYPE_MAP[entity_id];
+                    const state = new_state.state;
+                    const timestamp = new_state.last_updated;
+                    const friendly_name = new_state.attributes.friendly_name;
+                    const unit_of_measurement = new_state.attributes.unit_of_measurement;
 
                     const simplified: SensorAlert = {
                         type: "sensor_reading",
                         data: {
-                            plant_id: plantId,
-                            sensor_type,
-                            value,
+                            state,
                             timestamp,
                             friendly_name,
-                            alert,
+                            unit_of_measurement
                         },
                     };
+                    console.log("New sensor alert:", simplified);
 
-                    setLatestAlerts(simplified);
+                    setLatestAlert(simplified);
                 }
 
             }
@@ -122,83 +105,5 @@ export function useHomeAssistantWebSocket() {
         };
     }, []);
 
-    return { latestAlerts };
+    return { latestAlert };
 }
-
-export function getMockSensorAlerts(): SensorAlert[] {
-    return mockSensorAlerts;
-}
-export const mockSensorAlerts: SensorAlert[] = [
-    {
-        type: "sensor_reading",
-        data: {
-            plant_id: "1",
-            friendly_name: "Aloe Vera",
-            sensor_type: "moisture",
-            value: 25, // Below threshold (30)
-            timestamp: "2025-06-06T10:00:00Z",
-            alert: "below",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            plant_id: "1",
-            friendly_name: "Aloe Vera",
-            sensor_type: "temperature",
-            value: 35, // Above threshold (30)
-            timestamp: "2025-06-06T10:01:00Z",
-            alert: "above",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            plant_id: "2",
-            friendly_name: "Tomato Plant",
-            sensor_type: "humidity",
-            value: 25, // Below threshold (40)
-            timestamp: "2025-06-06T10:02:00Z",
-            alert: "below",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            sensor_type: "temperature",
-            friendly_name: "Room Temperature",
-            value: 34,
-            timestamp: "2025-06-06T10:10:00Z",
-            alert: "above",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            sensor_type: "humidity",
-            friendly_name: "Room Humidity",
-            value: 30,
-            timestamp: "2025-06-06T10:11:00Z",
-            alert: "below",
-        },
-    },
-    {
-        type: "sensor_reading",
-        data: {
-            sensor_type: "pressure",
-            friendly_name: "Barometric Pressure",
-            value: 1032,
-            timestamp: "2025-06-06T10:12:00Z",
-            alert: "above",
-        },
-    },
-    {
-        type: "watering_event",
-        data: {
-            plant_id: "1",
-            message: "Watering started",
-            timestamp: "2025-06-06T10:15:00Z",
-        },
-    },
-];
-

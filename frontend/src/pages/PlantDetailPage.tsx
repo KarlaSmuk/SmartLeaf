@@ -13,43 +13,27 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  getMockAirEntities,
-  getMockLeafMoistureHistory,
-  getMockPlantEntities,
-  triggerWatering,
-  updateThreshold,
-} from "../api/homeAssistant";
-import { getMockSensorAlerts } from "../hooks/useHomeAssistantWebSocket";
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-} from "recharts";
+import { triggerWatering, updateThreshold } from "../api/homeAssistant";
+import { type SensorAlert } from "../hooks/useHomeAssistantWebSocket";
+import { usePlantContext } from "../context/plant";
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const plantEntityId = id ?? "sensor.plant_1";
+  const { plants } = usePlantContext();
 
   //mock data
-  const plant = getMockPlantEntities().find(
-    (e) => e.entity_id === plantEntityId
-  );
-  const airEntities = getMockAirEntities();
+  const plant = plants.find((e) => e.entity_id === plantEntityId);
 
   //mock sensor readings instead of websocket
 
-  const historyReadings = getMockLeafMoistureHistory();
-  const systemAlerts = getMockSensorAlerts();
   const [moistureThreshold, setMoistureThreshold] = useState<number>(30);
   const [tempMinTreshold, setTempMinTreshold] = useState<number>(30);
   const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(50);
-  const [humidityThreshold, setHumidityThreshold] = useState<number>(30);
-  const [pressureThreshold, setPressureThreshold] = useState<number>(30);
+
+  //web socket
+
+  const systemAlerts: SensorAlert[] = [];
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
@@ -59,7 +43,7 @@ function PlantDetailPage() {
         color="success.main"
         gutterBottom
       >
-        {plant?.attributes.friendly_name ?? "Unknown Plant"}
+        {plant?.friendly_name ?? "Unknown Plant"}
       </Typography>
 
       <Button
@@ -84,17 +68,15 @@ function PlantDetailPage() {
 
             <Box sx={{ mt: 1 }}>
               <Typography variant="body1" sx={{ mb: 1 }}>
-                🌡️ {"Temperature"}:{" "}
-                {airEntities[0]?.attributes.temperature ?? "-"} °C
+                🌡️ {"Temperature"}: {plant?.currentValues.temperature ?? "-"} °C
               </Typography>
 
               <Typography variant="body1" sx={{ mb: 1 }}>
-                💧 {"Humidity"}: {airEntities[1]?.attributes.humidity ?? "-"} %
+                💧 {"Leaf Moisture"}: {plant?.currentValues.moisture ?? "-"} %
               </Typography>
 
               <Typography variant="body1">
-                📈 {"Pressure"}: {airEntities[2]?.attributes.pressure ?? "-"}{" "}
-                hPa
+                📈 {"Pressure"}: {plant?.currentValues.pressure ?? "-"} hPa
               </Typography>
             </Box>
           </CardContent>
@@ -166,65 +148,6 @@ function PlantDetailPage() {
               </Box>
             </Box>
           </Box>
-
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
-              Humidity Threshold
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "baseline" }}>
-              <TextField
-                fullWidth
-                label="Humidity (%)"
-                type="number"
-                value={humidityThreshold}
-                onChange={(e) =>
-                  setHumidityThreshold(parseFloat(e.target.value))
-                }
-                sx={{ width: 120 }}
-                size="small"
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  updateThreshold("input_number.", humidityThreshold);
-                }}
-                sx={{ ml: 2 }}
-                size="small"
-              >
-                Save
-              </Button>
-            </Box>
-          </Box>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
-              Air Pressure Threshold
-            </Typography>
-            <Box sx={{ display: "flex", alignItems: "baseline" }}>
-              <TextField
-                fullWidth
-                label="Pressure (hPa)"
-                type="number"
-                value={pressureThreshold}
-                onChange={(e) =>
-                  setPressureThreshold(parseFloat(e.target.value))
-                }
-                sx={{ width: 120 }}
-                size="small"
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  updateThreshold("input_number.", pressureThreshold);
-                }}
-                sx={{ ml: 2 }}
-                size="small"
-              >
-                Save
-              </Button>
-            </Box>
-          </Box>
         </Box>
       </Paper>
 
@@ -260,107 +183,35 @@ function PlantDetailPage() {
         />
       </Paper>
 
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          Leaf Moisture (Last 7 Days)
-        </Typography>
-
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart
-            data={historyReadings
-              .filter((r) => {
-                const date = new Date(r.timestamp);
-                const sevenDaysAgo = new Date();
-                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-                return date >= sevenDaysAgo;
-              })
-              .sort(
-                (a, b) =>
-                  new Date(a.timestamp).getTime() -
-                  new Date(b.timestamp).getTime()
-              )}
-            margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="timestamp"
-              tickFormatter={(str) =>
-                new Date(str).toLocaleDateString("en-GB", {
-                  day: "2-digit",
-                  month: "short",
-                })
-              }
-            />
-            <YAxis domain={[0, 100]} unit="%" />
-            <Tooltip
-              labelFormatter={(label) =>
-                new Date(label).toLocaleString("en-GB", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })
-              }
-            />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="#2e7d32"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </Paper>
-
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          Alerts
-        </Typography>
-        <Box display={"grid"} gap={"5px"}>
+      <Box mt={5}>
+        <Paper elevation={2} sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            System Alerts
+          </Typography>
           {systemAlerts.length > 0 ? (
             systemAlerts.map((alert, index) => {
               const { type, data } = alert;
 
               if (type === "watering_event") {
                 return (
-                  <Typography key={index} variant="body1" color="info.main">
+                  <Typography key={index} variant="body2" color="info.main">
                     💧 {data.message} —{" "}
                     {new Date(data.timestamp).toLocaleTimeString()}
                   </Typography>
                 );
               }
 
-              if (type === "sensor_reading" && data.alert) {
-                const label =
-                  data.alert === "above"
-                    ? "is above the recommended value"
-                    : "is below the recommended value";
-
-                // Add units based on sensor_type
-                let unit = "";
-                switch (data.sensor_type) {
-                  case "temperature":
-                    unit = "°C";
-                    break;
-                  case "humidity":
-                  case "moisture":
-                    unit = "%";
-                    break;
-                  case "pressure":
-                    unit = "hPa";
-                    break;
-                }
-
+              if (type === "sensor_reading") {
                 return (
                   <Typography
                     key={index}
-                    variant="body1"
+                    variant="body2"
                     color="error"
                     gutterBottom
                   >
-                    ⚠️ {data.friendly_name ?? data.sensor_type} {label}:{" "}
-                    {data.value}
-                    {unit} — {new Date(data.timestamp).toLocaleString()}
+                    ⚠️ {data.friendly_name}: {data.state}
+                    {data.unit_of_measurement} —{" "}
+                    {new Date(data.timestamp).toLocaleString()}
                   </Typography>
                 );
               }
@@ -372,8 +223,8 @@ function PlantDetailPage() {
               No alerts at the moment.
             </Typography>
           )}
-        </Box>
-      </Paper>
+        </Paper>
+      </Box>
     </Container>
   );
 }

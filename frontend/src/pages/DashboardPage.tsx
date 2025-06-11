@@ -6,20 +6,20 @@ import {
   Box,
   Paper,
   Button,
-  Chip,
 } from "@mui/material";
 import leafSvg from "../assets/growth-plant.svg";
 import { useNavigate } from "react-router-dom";
-import { getMockPlantEntities, triggerWatering } from "../api/homeAssistant";
-import { getMockSensorAlerts } from "../hooks/useHomeAssistantWebSocket";
+import { triggerWatering } from "../api/homeAssistant";
+import { type SensorAlert } from "../hooks/useHomeAssistantWebSocket";
+import { usePlantContext } from "../context/plant";
 
 function DashboardPage() {
   const navigate = useNavigate();
 
   //mock data
-  const plants = getMockPlantEntities();
+  const { plants } = usePlantContext();
   //mock sensor alerts instead of websocket
-  const systemAlerts = getMockSensorAlerts();
+  const systemAlerts: SensorAlert[] = [];
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -60,23 +60,9 @@ function DashboardPage() {
             >
               <CardContent>
                 <Typography variant="h5" color="success.main" gutterBottom>
-                  {plant.attributes.friendly_name ?? plant.entity_id}
+                  {plant.friendly_name ?? plant.entity_id}
                 </Typography>
-                <Box mt={2}>
-                  <Chip
-                    label={
-                      plant.attributes.automation_watering_enabled
-                        ? "Automation: ON"
-                        : "Automation: OFF"
-                    }
-                    color={
-                      plant.attributes.automation_watering_enabled
-                        ? "success"
-                        : "default"
-                    }
-                    size="small"
-                  />
-                </Box>
+                <Box mt={2}></Box>
                 <Box mt={2}>
                   <Button
                     variant="outlined"
@@ -113,27 +99,7 @@ function DashboardPage() {
                 );
               }
 
-              if (type === "sensor_reading" && data.alert) {
-                const label =
-                  data.alert === "above"
-                    ? "is above the recommended value"
-                    : "is below the recommended value";
-
-                // Add units based on sensor_type
-                let unit = "";
-                switch (data.sensor_type) {
-                  case "temperature":
-                    unit = "°C";
-                    break;
-                  case "humidity":
-                  case "moisture":
-                    unit = "%";
-                    break;
-                  case "pressure":
-                    unit = "hPa";
-                    break;
-                }
-
+              if (type === "sensor_reading") {
                 return (
                   <Typography
                     key={index}
@@ -141,9 +107,9 @@ function DashboardPage() {
                     color="error"
                     gutterBottom
                   >
-                    ⚠️ {data.friendly_name ?? data.sensor_type} {label}:{" "}
-                    {data.value}
-                    {unit} — {new Date(data.timestamp).toLocaleString()}
+                    ⚠️ {data.friendly_name}: {data.state}
+                    {data.unit_of_measurement} —{" "}
+                    {new Date(data.timestamp).toLocaleString()}
                   </Typography>
                 );
               }

@@ -30,7 +30,7 @@ app.post("/subscribe", (req, res) => {
 
 app.post("/notify", async (req, res) => {
   const { title = "SmartLeaf Alert", body = "Something happened!" } = req.body;
-
+  console.log("Sending notification:", { title, body });
   const payload = JSON.stringify({ title, body });
 
   for (const sub of subscriptions) {
