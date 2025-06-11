@@ -24,7 +24,11 @@ export const PushSetup: React.FC = () => {
 
         console.log("Push subscription:", subscription);
 
-        // TODO: Send this to your backend via fetch or WebSocket
+        await fetch(import.meta.env.VITE_PUSH_BACKEND + "/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(subscription),
+        });
       } catch (error) {
         console.error("Push setup failed:", error);
       }
