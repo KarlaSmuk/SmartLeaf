@@ -72,10 +72,34 @@ function PlantDetailPage() {
         <Box sx={{ mt: 2 }}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             <Typography>
-              🌡️ Temperature: {plant?.currentValues.temperature ?? "-"} °C
+              🌡️ Temperature:{" "}
+              <span
+                style={{
+                  color:
+                    plant!.currentValues.temperature <
+                      Number(plant?.thresholdsValues.temperature_min) ||
+                    plant!.currentValues.temperature >
+                      Number(plant?.thresholdsValues.temperature_max)
+                      ? "red"
+                      : "inherit",
+                }}
+              >
+                {plant?.currentValues.temperature ?? "-"} °C
+              </span>
             </Typography>
             <Typography>
-              💧 Leaf Moisture: {plant?.currentValues.moisture ?? "-"} %
+              💧 Leaf Moisture:{" "}
+              <span
+                style={{
+                  color:
+                    plant!.currentValues.moisture <
+                    Number(plant?.thresholdsValues.moisture)
+                      ? "red"
+                      : "inherit",
+                }}
+              >
+                {plant?.currentValues.moisture ?? "-"} %
+              </span>
             </Typography>
             <Typography>
               📈 Air Pressure: {plant?.currentValues.pressure ?? "-"} hPa
