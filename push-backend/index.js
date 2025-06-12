@@ -108,6 +108,27 @@ haWs.on("message", (raw) => {
         },
       };
 
+      if (entity_id.includes("watering")) {
+        alert = {
+          type: "watering_event",
+          data: {
+            state,
+            timestamp,
+            friendly_name,
+          },
+        };
+      } else if (entity_id.startsWith("script.water_")) {
+        alert = {
+          type: "sensor_reading",
+          data: {
+            state,
+            timestamp,
+            friendly_name,
+            unit_of_measurement,
+          },
+        };
+      }
+
       console.log("Detected alert:", alert);
 
       if (subscriptions.length === 0) {
