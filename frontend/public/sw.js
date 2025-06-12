@@ -1,8 +1,6 @@
 self.addEventListener("push", function (event) {
   event.waitUntil(
     (async () => {
-      let fallback = "You have a new alert";
-
       try {
         const alert = event.data?.json();
 
