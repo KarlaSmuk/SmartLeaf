@@ -4,7 +4,7 @@ import { useAlertContext } from "../context/alert";
 import type { SensorAlert } from "../hooks/useHomeAssistantWebSocket";
 
 export function PushListener() {
-  const { enqueueSnackbar } = useSnackbar();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const { addAlert } = useAlertContext();
 
   useEffect(() => {
@@ -18,11 +18,31 @@ export function PushListener() {
           const { friendly_name, state, unit_of_measurement } = alert.data;
 
           enqueueSnackbar(
-            `🌿 ${friendly_name ?? "Sensor"}: ${state} ${
-              unit_of_measurement ?? ""
-            }`,
-            { variant: type == "watering_event" ? "info" : "warning" }
+            `🌿 ${friendly_name ?? "Sensor"}${
+              type == "sensor_reading" ? ":" : ""
+            } ${state ?? ""} ${unit_of_measurement ?? ""}`,
+            {
+              variant: type == "watering_event" ? "info" : "warning",
+              action: (key) => (
+                <button
+                  onClick={() => {
+                    closeSnackbar(key);
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "inherit",
+                    cursor: "pointer",
+                    fontSize: "1.2em",
+                  }}
+                  aria-label="close"
+                >
+                  ×
+                </button>
+              ),
+            }
           );
+
           addAlert(alert);
         }
       });

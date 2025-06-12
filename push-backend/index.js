@@ -35,20 +35,22 @@ app.post("/subscribe", (req, res) => {
 //FOR TESTING PURPOSES
 app.post("/mock-alert", (req, res) => {
   const alert = {
-    type: "sensor_reading",
+    type: req.body.type,
     data: {
-      state: (Math.random() * 20 + 10).toFixed(1),
-      timestamp: new Date().toISOString(),
-      friendly_name: "💧 Simulated Plant Moisture",
-      unit_of_measurement: "%",
+      state: req.body.data.state,
+      timestamp: req.body.data.timestamp,
+      friendly_name: req.body.data.friendly_name,
+      unit_of_measurement: req.body.data.unit_of_measurement || undefined,
     },
   };
 
   if (subscriptions.length === 0) {
     // Local desktop fallback
     notifier.notify({
-      title: "SmartLeaf Alert",
-      message: `${alert.data?.friendly_name || "Sensor"}: ${alert.data?.state}`,
+      title: "🌿 SmartLeaf Alert",
+      message: `${alert.data.friendly_name}${alert.data.state ? ":" : ""} ${
+        alert.data.state ?? ""
+      }`,
       sound: true,
       wait: false,
     });
@@ -134,7 +136,7 @@ haWs.on("message", (raw) => {
       if (subscriptions.length === 0) {
         // Local desktop fallback
         notifier.notify({
-          title: "SmartLeaf Alert",
+          title: "🌿 SmartLeaf Alert",
           message: `${alert.data?.friendly_name || "Sensor"}: ${
             alert.data?.state
           }`,

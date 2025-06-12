@@ -21,6 +21,7 @@ if (!rootElement.innerHTML) {
         <SnackbarProvider
           maxSnack={3}
           anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          autoHideDuration={null}
         >
           <ThemeProvider theme={theme}>
             <CssBaseline />

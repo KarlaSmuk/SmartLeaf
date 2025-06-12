@@ -243,8 +243,13 @@ function PlantDetailPage() {
 
               if (type === "watering_event") {
                 return (
-                  <Typography key={index} variant="body2" color="info.main">
-                    💧 {data.message} —{" "}
+                  <Typography
+                    key={index}
+                    variant="body2"
+                    color="info.main"
+                    gutterBottom
+                  >
+                    💧 {data.friendly_name} —{" "}
                     {new Date(data.timestamp).toLocaleTimeString()}
                   </Typography>
                 );
