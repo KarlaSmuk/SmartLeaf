@@ -59,7 +59,6 @@ function DashboardPage() {
                 <Typography variant="h5" color="success.main" gutterBottom>
                   {plant.friendly_name ?? plant.entity_id}
                 </Typography>
-                <Box mt={2}></Box>
                 <Box mt={2}>
                   <Button
                     variant="outlined"

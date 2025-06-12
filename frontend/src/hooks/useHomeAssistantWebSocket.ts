@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 type HAWebSocketEvent = {
     id: number;
@@ -41,7 +41,6 @@ export type SensorAlert = {
 type SensorType = "moisture" | "temperature" | "humidity" | "pressure";
 
 export function useHomeAssistantWebSocket() {
-    const [latestAlert, setLatestAlert] = useState<SensorAlert | null>(null);
     const socketRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -72,25 +71,15 @@ export function useHomeAssistantWebSocket() {
             if (msg.type === "event") {
                 const eventMsg = msg as HAWebSocketEvent;
                 const { entity_id, new_state } = eventMsg.event.data;
-                if (entity_id.startsWith("automation.")) {
+                if (entity_id.endsWith("threshold")) {
                     console.log(msg)
+                    //TODO handle threshold updates
+                    // const state = new_state.state;
+                    // const timestamp = new_state.last_updated;
+                    // const friendly_name = new_state.attributes.friendly_name;
+                    // const unit_of_measurement = new_state.attributes.unit_of_measurement;
 
-                    const state = new_state.state;
-                    const timestamp = new_state.last_updated;
-                    const friendly_name = new_state.attributes.friendly_name;
-                    const unit_of_measurement = new_state.attributes.unit_of_measurement;
-
-                    const simplified: SensorAlert = {
-                        type: "sensor_reading",
-                        data: {
-                            state,
-                            timestamp,
-                            friendly_name,
-                            unit_of_measurement
-                        },
-                    };
-
-                    setLatestAlert(simplified);
+                    console.log(new_state);
                 }
 
             }
@@ -103,7 +92,4 @@ export function useHomeAssistantWebSocket() {
             ws.close();
         };
     }, []);
-
-
-    return { latestAlert };
 }
