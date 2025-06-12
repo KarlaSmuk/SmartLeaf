@@ -89,7 +89,6 @@ export function useHomeAssistantWebSocket() {
                             unit_of_measurement
                         },
                     };
-                    console.log("New sensor alert:", simplified);
 
                     setLatestAlert(simplified);
                 }
@@ -104,6 +103,7 @@ export function useHomeAssistantWebSocket() {
             ws.close();
         };
     }, []);
+
 
     return { latestAlert };
 }

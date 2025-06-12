@@ -10,16 +10,16 @@ import {
 import leafSvg from "../assets/growth-plant.svg";
 import { useNavigate } from "react-router-dom";
 import { triggerWatering } from "../api/homeAssistant";
-import { type SensorAlert } from "../hooks/useHomeAssistantWebSocket";
 import { usePlantContext } from "../context/plant";
+import { useAlertContext } from "../context/alert";
 
 function DashboardPage() {
   const navigate = useNavigate();
 
+  const { alerts: systemAlerts } = useAlertContext();
+
   //mock data
   const { plants } = usePlantContext();
-  //mock sensor alerts instead of websocket
-  const systemAlerts: SensorAlert[] = [];
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>

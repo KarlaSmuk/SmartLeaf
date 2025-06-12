@@ -1,21 +1,47 @@
 self.addEventListener("push", function (event) {
-  let body = "You have a new alert";
+  event.waitUntil(
+    (async () => {
+      let fallback = "You have a new alert";
 
-  try {
-    // JSON payload
-    const data = event.data?.json();
-    self.registration.showNotification(data?.title || "SmartLeaf Alert", {
-      body: data?.body || body,
-      icon: "/growth-plant.png",
-      badge: "/growth-plant.png",
-    });
-  } catch {
-    // plain text
-    const text = event.data?.text();
-    self.registration.showNotification("SmartLeaf Alert", {
-      body: text || body,
-      icon: "/growth-plant.png",
-      badge: "/growth-plant.png",
-    });
-  }
+      try {
+        const alert = event.data?.json();
+
+        const title = "🌿 SmartLeaf Sensor Alert";
+        const body = `${alert.data?.friendly_name ?? "Sensor"}: ${
+          alert.data?.state ?? "-"
+        } ${alert.data?.unit_of_measurement ?? ""}`;
+
+        const clientsList = await self.clients.matchAll({
+          type: "window",
+          includeUncontrolled: true,
+        });
+
+        const visibleClient = clientsList.find(
+          (client) => client.visibilityState === "visible"
+        );
+
+        if (visibleClient) {
+          // Tab is visible
+          visibleClient.postMessage({ type: "sensor_alert", alert });
+        } else {
+          // No visible tab
+          self.registration.showNotification(title, {
+            body,
+            icon: "/growth-plant.png",
+            badge: "/growth-plant.png",
+            data: alert,
+          });
+        }
+      } catch (error) {
+        console.error("Error parsing push data:", error);
+
+        // ❗ Show fallback system notification
+        self.registration.showNotification("🌿 SmartLeaf", {
+          body: fallback,
+          icon: "/growth-plant.png",
+          badge: "/growth-plant.png",
+        });
+      }
+    })()
+  );
 });

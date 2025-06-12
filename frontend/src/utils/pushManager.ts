@@ -27,8 +27,6 @@ export async function subscribeToPushNotifications(
         userVisibleOnly: true,
         applicationServerKey,
     });
-
-    console.log("🔐 Push Subscription:", JSON.stringify(subscription));
-
+    
     return subscription;
 }

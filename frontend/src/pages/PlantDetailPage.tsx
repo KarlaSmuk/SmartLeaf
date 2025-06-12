@@ -14,8 +14,8 @@ import {
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { triggerWatering, updateThreshold } from "../api/homeAssistant";
-import { type SensorAlert } from "../hooks/useHomeAssistantWebSocket";
 import { usePlantContext } from "../context/plant";
+import { useAlertContext } from "../context/alert";
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -32,8 +32,7 @@ function PlantDetailPage() {
   const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(50);
 
   //web socket
-
-  const systemAlerts: SensorAlert[] = [];
+  const { alerts: systemAlerts } = useAlertContext();
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>

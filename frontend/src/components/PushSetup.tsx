@@ -22,8 +22,6 @@ export const PushSetup: React.FC = () => {
         const registration = await registerServiceWorker();
         const subscription = await subscribeToPushNotifications(registration);
 
-        console.log("Push subscription:", subscription);
-
         await fetch(import.meta.env.VITE_PUSH_BACKEND + "/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

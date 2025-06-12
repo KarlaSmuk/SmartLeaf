@@ -108,7 +108,7 @@ haWs.on("message", (raw) => {
         },
       };
 
-      console.log("📡 Detected alert:", alert);
+      console.log("Detected alert:", alert);
 
       if (subscriptions.length === 0) {
         // Local desktop fallback
