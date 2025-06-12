@@ -42,14 +42,14 @@ export const initialPlantsData: PlantData[] = [
             start: "input_number.plant_watering_start",
         },
         thresholdsValues: {
-            moisture: "45",
-            temperature_min: "20",
-            temperature_max: "28",
+            moisture: "0",
+            temperature_min: "0",
+            temperature_max: "0",
         },
         currentValues: {
-            moisture: 24,
-            temperature: 55,
-            pressure: 1010
+            moisture: 0,
+            temperature: 0,
+            pressure: 0
         }
     },
     {

@@ -6,16 +6,19 @@ import {
   TextField,
   Box,
   Button,
+  IconButton,
 } from "@mui/material";
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { triggerWatering, updateThreshold } from "../api/homeAssistant";
 import { useAlertContext } from "../context/alert";
 import { useSensorValues } from "../hooks/useSensorValues";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const plantEntityId = id ?? "sensor.plant_1";
+  const navigate = useNavigate();
 
   const { plants, loading } = useSensorValues();
 
@@ -42,14 +45,22 @@ function PlantDetailPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
-      <Typography
-        variant="h4"
-        fontWeight={700}
-        color="success.main"
-        gutterBottom
-      >
-        {plant?.friendly_name ?? "Unknown Plant"}
-      </Typography>
+      <Box display="flex" flexDirection={"row"} gap={2}>
+        <IconButton
+          onClick={() => navigate(-1)}
+          sx={{ alignSelf: "flex-start", mb: 2 }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography
+          variant="h4"
+          fontWeight={700}
+          color="success.main"
+          gutterBottom
+        >
+          {plant?.friendly_name ?? "Unknown Plant"}
+        </Typography>
+      </Box>
 
       <Button
         variant="outlined"

@@ -7,9 +7,9 @@ self.addEventListener("push", function (event) {
         const alert = event.data?.json();
 
         const title = "🌿 SmartLeaf Sensor Alert";
-        const body = `${alert.data?.friendly_name ?? "Sensor"}: ${
-          alert.data?.state ?? "-"
-        } ${alert.data?.unit_of_measurement ?? ""}`;
+        const body = `${alert.data?.friendly_name ?? "Sensor"}${
+          alert.data.state ? ":" : ""
+        } ${alert.data?.state ?? "-"} ${alert.data?.unit_of_measurement ?? ""}`;
 
         const clientsList = await self.clients.matchAll({
           type: "window",
@@ -34,13 +34,6 @@ self.addEventListener("push", function (event) {
         }
       } catch (error) {
         console.error("Error parsing push data:", error);
-
-        // ❗ Show fallback system notification
-        self.registration.showNotification("🌿 SmartLeaf", {
-          body: fallback,
-          icon: "/growth-plant.png",
-          badge: "/growth-plant.png",
-        });
       }
     })()
   );
