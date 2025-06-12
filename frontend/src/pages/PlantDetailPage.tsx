@@ -4,12 +4,8 @@ import {
   Divider,
   Paper,
   TextField,
-  FormControlLabel,
-  Switch,
   Box,
   Button,
-  Card,
-  CardContent,
 } from "@mui/material";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -37,11 +33,12 @@ function PlantDetailPage() {
   const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(
     parseFloat(plant?.thresholdsValues.temperature_max ?? "0")
   );
+  const [wateringDuration, setWateringDuration] = useState<number>(5); // default 5 sec
 
   //web socket
   const { alerts: systemAlerts } = useAlertContext();
 
-  if (loading) return <div>Loading sensor values...</div>;
+  // if (loading) return <div>Loading sensor values...</div>;
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
@@ -68,30 +65,28 @@ function PlantDetailPage() {
       <Divider sx={{ my: 3 }} />
 
       <Paper sx={{ p: 3, mb: 4 }}>
-        <Card sx={{ px: 2, py: 2, borderRadius: 2, boxShadow: 3 }}>
-          <CardContent>
-            <Typography variant="h5" gutterBottom>
-              Environmental Conditions
+        <Typography variant="h5" fontWeight={600} gutterBottom>
+          🌿 Plant Configuration & Environment
+        </Typography>
+
+        <Box sx={{ mt: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Typography>
+              🌡️ Temperature: {plant?.currentValues.temperature ?? "-"} °C
             </Typography>
+            <Typography>
+              💧 Leaf Moisture: {plant?.currentValues.moisture ?? "-"} %
+            </Typography>
+            <Typography>
+              📈 Air Pressure: {plant?.currentValues.pressure ?? "-"} hPa
+            </Typography>
+          </Box>
+        </Box>
 
-            <Box sx={{ mt: 1 }}>
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                🌡️ {"Temperature"}: {plant?.currentValues.temperature ?? "-"} °C
-              </Typography>
+        <Divider sx={{ my: 3 }} />
 
-              <Typography variant="body1" sx={{ mb: 1 }}>
-                💧 {"Leaf Moisture"}: {plant?.currentValues.moisture ?? "-"} %
-              </Typography>
-
-              <Typography variant="body1">
-                📈 {"Pressure"}: {plant?.currentValues.pressure ?? "-"} hPa
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
-
-        <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-          Configure Your Environment
+        <Typography variant="subtitle1" fontWeight={550} mb={1.5}>
+          Set Thresholds
         </Typography>
 
         <Box sx={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
@@ -108,7 +103,7 @@ function PlantDetailPage() {
               <Box sx={{ display: "flex", alignItems: "baseline" }}>
                 <TextField
                   fullWidth
-                  label="Min Temp (°C)"
+                  label="Min (°C)"
                   type="number"
                   value={tempMinTreshold}
                   onChange={(e) =>
@@ -121,7 +116,10 @@ function PlantDetailPage() {
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    updateThreshold("input_number.", tempMinTreshold);
+                    updateThreshold(
+                      plant!.thresholds.temperature_min,
+                      tempMinTreshold
+                    );
                   }}
                   sx={{ ml: 2 }}
                   size="small"
@@ -133,7 +131,7 @@ function PlantDetailPage() {
               <Box sx={{ mt: 3, display: "flex", alignItems: "baseline" }}>
                 <TextField
                   fullWidth
-                  label="Max Temp (°C)"
+                  label="Max (°C)"
                   type="number"
                   value={tempMaxTreshold}
                   onChange={(e) =>
@@ -146,7 +144,46 @@ function PlantDetailPage() {
                   variant="contained"
                   color="primary"
                   onClick={() => {
-                    updateThreshold("input_number.", tempMaxTreshold);
+                    updateThreshold(
+                      plant!.thresholds.temperature_max,
+                      tempMaxTreshold
+                    );
+                  }}
+                  sx={{ ml: 2 }}
+                  size="small"
+                >
+                  Save
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+
+          <Box>
+            <Typography variant="subtitle2" gutterBottom sx={{ mb: 2 }}>
+              Leaf Moisture Threshold
+            </Typography>
+
+            <Box display={"flex"} flexDirection="column">
+              <Box sx={{ display: "flex", alignItems: "baseline" }}>
+                <TextField
+                  fullWidth
+                  label="Moisture (%)"
+                  type="number"
+                  value={moistureThreshold}
+                  onChange={(e) =>
+                    setMoistureThreshold(parseFloat(e.target.value))
+                  }
+                  sx={{ width: 120 }}
+                  size="small"
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    updateThreshold(
+                      plant!.thresholds.moisture,
+                      moistureThreshold
+                    );
                   }}
                   sx={{ ml: 2 }}
                   size="small"
@@ -159,36 +196,40 @@ function PlantDetailPage() {
         </Box>
       </Paper>
 
-      <Paper sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-          Plant Settings
+      <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          💧 Manual Watering Control
         </Typography>
-        <Box display={"flex"} sx={{ mb: 2 }} alignItems={"baseline"} gap={2}>
+
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          Set the watering duration and start watering manually.
+        </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <TextField
-            fullWidth
-            label="Moisture Threshold (%)"
+            label="Watering Duration"
             type="number"
-            value={moistureThreshold}
-            onChange={(e) => setMoistureThreshold(parseFloat(e.target.value))}
-            sx={{ width: 400 }}
+            size="small"
+            value={wateringDuration}
+            onChange={(e) => setWateringDuration(parseInt(e.target.value, 10))}
+            sx={{ width: 200 }}
+            InputProps={{
+              endAdornment: <Typography sx={{ ml: 1 }}>seconds</Typography>,
+            }}
           />
+
           <Button
             variant="contained"
             color="primary"
-            onClick={() => {
-              updateThreshold(
-                "input_number.plant1_moisture_threshold",
-                moistureThreshold
-              );
+            size="small"
+            onClick={async () => {
+              await updateThreshold(plant!.watering.duration, wateringDuration);
+              await updateThreshold(plant!.watering.start, 1);
             }}
           >
-            Save
+            Start Watering
           </Button>
         </Box>
-        <FormControlLabel
-          control={<Switch defaultChecked />}
-          label="Enable Auto Watering"
-        />
       </Paper>
 
       <Box mt={5}>

@@ -11,6 +11,10 @@ export type PlantData = {
     entity_id: string;
     sensors: Record<PlantSensorType, string>;
     thresholds: Thresholds;
+    watering: {
+        duration: string;
+        start: string;
+    };
     thresholdsValues: Thresholds;
     currentValues: {
         moisture: number;
@@ -32,6 +36,10 @@ export const initialPlantsData: PlantData[] = [
             moisture: "input_number.plant1_moisture_threshold",
             temperature_min: "input_number.plant1_temperature_min_threshold",
             temperature_max: "input_number.plant1_temperature_max_threshold",
+        },
+        watering: {
+            duration: "input_number.plant_watering_time",
+            start: "input_number.plant_watering_start",
         },
         thresholdsValues: {
             moisture: "0",
@@ -56,6 +64,10 @@ export const initialPlantsData: PlantData[] = [
             moisture: "input_number.plant2_moisture_threshold",
             temperature_min: "input_number.plant2_temperature_min_threshold",
             temperature_max: "input_number.plant2_temperature_max_threshold",
+        },
+        watering: {
+            duration: "input_number.plant_2_watering_time",
+            start: "input_number.plant_2_watering_start",
         },
         thresholdsValues: {
             moisture: "0",
