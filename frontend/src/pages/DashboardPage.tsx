@@ -10,16 +10,13 @@ import {
 import leafSvg from "../assets/growth-plant.svg";
 import { useNavigate } from "react-router-dom";
 import { triggerWatering } from "../api/homeAssistant";
-import { usePlantContext } from "../context/plant";
 import { useAlertContext } from "../context/alert";
+import { initialPlantsData } from "../api/plants";
 
 function DashboardPage() {
   const navigate = useNavigate();
 
   const { alerts: systemAlerts } = useAlertContext();
-
-  //mock data
-  const { plants } = usePlantContext();
 
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
@@ -41,7 +38,7 @@ function DashboardPage() {
         mt={2}
         justifyContent="flex-start"
       >
-        {plants.map((plant) => (
+        {initialPlantsData.map((plant) => (
           <Box
             onClick={() => navigate(`/plant/${plant.entity_id}`)}
             key={plant.entity_id}

@@ -6,7 +6,6 @@ import theme from "./theme";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SnackbarProvider } from "notistack";
 import { PushSetup } from "./components/PushSetup";
-import { PlantProvider } from "./context/plant";
 import { PushListener } from "./components/PushListener";
 import { AlertProvider } from "./context/alert";
 
@@ -25,13 +24,11 @@ if (!rootElement.innerHTML) {
         >
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <PlantProvider>
-              <AlertProvider>
-                <PushSetup />
-                <PushListener />
-                <App />
-              </AlertProvider>
-            </PlantProvider>
+            <AlertProvider>
+              <PushSetup />
+              <PushListener />
+              <App />
+            </AlertProvider>
           </ThemeProvider>
         </SnackbarProvider>
       </BrowserRouter>
