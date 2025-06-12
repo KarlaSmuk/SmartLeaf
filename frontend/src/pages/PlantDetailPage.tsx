@@ -14,25 +14,34 @@ import {
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { triggerWatering, updateThreshold } from "../api/homeAssistant";
-import { usePlantContext } from "../context/plant";
 import { useAlertContext } from "../context/alert";
+import { useSensorValues } from "../hooks/useSensorValues";
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const plantEntityId = id ?? "sensor.plant_1";
-  const { plants } = usePlantContext();
+
+  const { plants, loading } = useSensorValues();
 
   //mock data
   const plant = plants.find((e) => e.entity_id === plantEntityId);
 
   //mock sensor readings instead of websocket
 
-  const [moistureThreshold, setMoistureThreshold] = useState<number>(30);
-  const [tempMinTreshold, setTempMinTreshold] = useState<number>(30);
-  const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(50);
+  const [moistureThreshold, setMoistureThreshold] = useState<number>(
+    parseFloat(plant?.thresholdsValues.moisture ?? "0")
+  );
+  const [tempMinTreshold, setTempMinTreshold] = useState<number>(
+    parseFloat(plant?.thresholdsValues.temperature_min ?? "0")
+  );
+  const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(
+    parseFloat(plant?.thresholdsValues.temperature_max ?? "0")
+  );
 
   //web socket
   const { alerts: systemAlerts } = useAlertContext();
+
+  if (loading) return <div>Loading sensor values...</div>;
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>

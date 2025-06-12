@@ -39,8 +39,8 @@ export type Plant = {
     thresholds: PlantThresholds;
 };
 
-//MARK: SENSOR STATE
-export async function getSensorState(entityId: string): Promise<HAEntity> {
+//MARK: ENTITY STATE
+export async function getEntityState(entityId: string): Promise<HAEntity> {
     const res = await fetch(`${HA_URL}/api/states/${entityId}`, {
         headers: {
             Authorization: `Bearer ${HA_TOKEN}`,
@@ -55,6 +55,7 @@ export async function getSensorState(entityId: string): Promise<HAEntity> {
     return res.json();
 }
 
+//MARK: UPDATE THRESHOLD
 export async function updateThreshold(entityId: string, value: number): Promise<void> {
     const res = await fetch(`${HA_URL}/api/services/input_number/set_value`, {
         method: "POST",
