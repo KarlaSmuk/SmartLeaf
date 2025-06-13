@@ -31,7 +31,7 @@ function PlantDetailPage() {
       setTempMaxTreshold(parseFloat(state));
     }
   });
-  const { plants, loading } = useSensorValues();
+  const { plants } = useSensorValues();
 
   //mock data
   const plant = plants.find((e) => e.entity_id === plantEntityId);
