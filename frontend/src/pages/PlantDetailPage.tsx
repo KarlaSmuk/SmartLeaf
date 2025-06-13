@@ -8,40 +8,50 @@ import {
   Button,
   IconButton,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { triggerWatering, updateThreshold } from "../api/homeAssistant";
 import { useAlertContext } from "../context/alert";
 import { useSensorValues } from "../hooks/useSensorValues";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useHomeAssistantWebSocket } from "../hooks/useHomeAssistantWebSocket";
 
 function PlantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const plantEntityId = id ?? "sensor.plant_1";
   const navigate = useNavigate();
 
+  useHomeAssistantWebSocket((entity_id, state) => {
+    console.log("🌡️ Received threshold update:", entity_id, state);
+    if (entity_id.includes("moisture")) {
+      setMoistureThreshold(parseFloat(state));
+    } else if (entity_id.includes("temperature_min")) {
+      setTempMinTreshold(parseFloat(state));
+    } else if (entity_id.includes("temperature_max")) {
+      setTempMaxTreshold(parseFloat(state));
+    }
+  });
   const { plants, loading } = useSensorValues();
 
   //mock data
   const plant = plants.find((e) => e.entity_id === plantEntityId);
 
   //mock sensor readings instead of websocket
-
-  const [moistureThreshold, setMoistureThreshold] = useState<number>(
-    parseFloat(plant?.thresholdsValues.moisture ?? "0")
-  );
-  const [tempMinTreshold, setTempMinTreshold] = useState<number>(
-    parseFloat(plant?.thresholdsValues.temperature_min ?? "0")
-  );
-  const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(
-    parseFloat(plant?.thresholdsValues.temperature_max ?? "0")
-  );
+  const [moistureThreshold, setMoistureThreshold] = useState<number>(0);
+  const [tempMinTreshold, setTempMinTreshold] = useState<number>(0);
+  const [tempMaxTreshold, setTempMaxTreshold] = useState<number>(0);
   const [wateringDuration, setWateringDuration] = useState<number>(5); // default 5 sec
 
   //web socket
   const { alerts: systemAlerts } = useAlertContext();
 
-  // if (loading) return <div>Loading sensor values...</div>;
+  useEffect(() => {
+    if (plant?.thresholdsValues.moisture && moistureThreshold === 0) {
+      setMoistureThreshold(parseFloat(plant.thresholdsValues.moisture));
+      setTempMinTreshold(parseFloat(plant.thresholdsValues.temperature_min));
+      setTempMaxTreshold(parseFloat(plant.thresholdsValues.temperature_max));
+    }
+  }, [plant]);
 
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>

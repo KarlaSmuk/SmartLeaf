@@ -33,9 +33,9 @@ export const initialPlantsData: PlantData[] = [
             air_pressure: "sensor.plant_1_air_pressure",
         },
         thresholds: {
-            moisture: "input_number.plant1_moisture_threshold",
-            temperature_min: "input_number.plant1_temperature_min_threshold",
-            temperature_max: "input_number.plant1_temperature_max_threshold",
+            moisture: "input_number.plant_1_moisture_threshold",
+            temperature_min: "input_number.plant_1_temperature_min_threshold",
+            temperature_max: "input_number.plant_1_temperature_max_threshold",
         },
         watering: {
             duration: "input_number.plant_watering_time",
@@ -61,9 +61,9 @@ export const initialPlantsData: PlantData[] = [
             air_pressure: "sensor.plant_2_air_pressure",
         },
         thresholds: {
-            moisture: "input_number.plant2_moisture_threshold",
-            temperature_min: "input_number.plant2_temperature_min_threshold",
-            temperature_max: "input_number.plant2_temperature_max_threshold",
+            moisture: "input_number.plant_2_moisture_threshold",
+            temperature_min: "input_number.plant_2_temperature_min_threshold",
+            temperature_max: "input_number.plant_2_temperature_max_threshold",
         },
         watering: {
             duration: "input_number.plant_2_watering_time",

@@ -40,7 +40,9 @@ export type SensorAlert = {
 
 type SensorType = "moisture" | "temperature" | "humidity" | "pressure";
 
-export function useHomeAssistantWebSocket() {
+export function useHomeAssistantWebSocket(
+    onThresholdUpdate?: (entity_id: string, state: string) => void
+) {
     const socketRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
@@ -72,14 +74,8 @@ export function useHomeAssistantWebSocket() {
                 const eventMsg = msg as HAWebSocketEvent;
                 const { entity_id, new_state } = eventMsg.event.data;
                 if (entity_id.endsWith("threshold")) {
-                    console.log(msg)
-                    //TODO handle threshold updates
-                    // const state = new_state.state;
-                    // const timestamp = new_state.last_updated;
-                    // const friendly_name = new_state.attributes.friendly_name;
-                    // const unit_of_measurement = new_state.attributes.unit_of_measurement;
-
-                    console.log(new_state);
+                    const state = new_state.state;
+                    onThresholdUpdate?.(entity_id, state);
                 }
 
             }
@@ -87,9 +83,5 @@ export function useHomeAssistantWebSocket() {
 
         ws.onerror = (err) => console.error("HA WebSocket error:", err);
         ws.onclose = () => console.warn("HA WebSocket closed");
-
-        return () => {
-            ws.close();
-        };
-    }, []);
+    }, [onThresholdUpdate]);
 }

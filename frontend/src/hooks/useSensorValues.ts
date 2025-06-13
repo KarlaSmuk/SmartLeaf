@@ -28,7 +28,6 @@ export function useSensorValues() {
                             getEntityState(thresholds.temperature_min),
                             getEntityState(thresholds.temperature_max),
                         ]);
-
                         return {
                             ...plant,
                             currentValues: {

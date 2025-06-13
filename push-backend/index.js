@@ -99,8 +99,8 @@ haWs.on("message", (raw) => {
       const timestamp = new_state.last_updated;
       const friendly_name = new_state.attributes.friendly_name;
       const unit_of_measurement = new_state.attributes.unit_of_measurement;
-
-      const alert = {
+      console.log(entity_id);
+      let alert = {
         type: "sensor_reading",
         data: {
           state,
@@ -119,7 +119,7 @@ haWs.on("message", (raw) => {
             friendly_name,
           },
         };
-      } else if (entity_id.startsWith("script.water_")) {
+      } else {
         alert = {
           type: "sensor_reading",
           data: {
