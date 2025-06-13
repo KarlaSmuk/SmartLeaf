@@ -77,7 +77,7 @@ function PlantDetailPage() {
         sx={{ mt: 2 }}
         onClick={(e) => {
           e.stopPropagation();
-          triggerWatering(plantEntityId);
+          triggerWatering("script.water_" + plantEntityId);
         }}
       >
         💧 Manual Watering
