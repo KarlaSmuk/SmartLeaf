@@ -94,7 +94,10 @@ haWs.on("message", (raw) => {
     const event = msg.event;
     const { entity_id, new_state } = event.data;
 
-    if (entity_id.startsWith("automation.")) {
+    if (
+      entity_id.startsWith("automation.") &&
+      new_state.attributes.current == 1
+    ) {
       const state = new_state.state;
       const timestamp = new_state.last_updated;
       const friendly_name = new_state.attributes.friendly_name;
