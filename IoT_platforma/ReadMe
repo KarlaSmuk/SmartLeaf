@@ -1,0 +1,6 @@
+Nakon pokretanja Home Assistant-a kroz virtual box, za pregled rješenja potrebno je kopirati sadržaj 
+configurations.yaml, automations.yaml te u dashboard kopirati ui.yaml.
+
+Za pokretanje simulacije senzora potrebno je pokrenuti skriptu mock_data.py koja periodično šalje nasumične vrijednosti za 
+svaki senzor.
+Za pokretanje virtualnog aktuatora potrebno je pokrenuti skriptu virtual_actuator.py.
