@@ -140,8 +140,10 @@ haWs.on("message", (raw) => {
         // Local desktop fallback
         notifier.notify({
           title: "🌿 SmartLeaf Alert",
-          message: `${alert.data?.friendly_name || "Sensor"}: ${
-            alert.data?.state
+          message: `${alert.data?.friendly_name ?? "Sensor"}${
+            alert.data.state != "on" ? ":" : ""
+          } ${alert.data?.state != "on" ? alert.data.state : ""} ${
+            alert.data?.unit_of_measurement ?? ""
           }`,
           sound: true,
           wait: false,

@@ -6,8 +6,10 @@ self.addEventListener("push", function (event) {
 
         const title = "🌿 SmartLeaf Sensor Alert";
         const body = `${alert.data?.friendly_name ?? "Sensor"}${
-          alert.data.state ? ":" : ""
-        } ${alert.data?.state ?? "-"} ${alert.data?.unit_of_measurement ?? ""}`;
+          alert.data.state != "on" ? ":" : ""
+        } ${alert.data?.state != "on" ? alert.data.state : ""} ${
+          alert.data?.unit_of_measurement ?? ""
+        }`;
 
         const clientsList = await self.clients.matchAll({
           type: "window",

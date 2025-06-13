@@ -15,12 +15,13 @@ export function PushListener() {
         if (msg?.type === "sensor_alert") {
           const alert: SensorAlert = msg.alert;
           const type = alert.type;
-          const { friendly_name, state, unit_of_measurement } = alert.data;
 
           enqueueSnackbar(
-            `🌿 ${friendly_name ?? "Sensor"}${
-              type == "sensor_reading" ? ":" : ""
-            } ${state ?? ""} ${unit_of_measurement ?? ""}`,
+            `🌿 ${alert.data?.friendly_name ?? "Sensor"}${
+              alert.data.state != "on" ? ":" : ""
+            } ${alert.data?.state != "on" ? alert.data.state : ""} ${
+              alert.data?.unit_of_measurement ?? ""
+            }`,
             {
               variant: type == "watering_event" ? "info" : "warning",
               action: (key) => (

@@ -308,7 +308,9 @@ function PlantDetailPage() {
                     color="error"
                     gutterBottom
                   >
-                    ⚠️ {data.friendly_name}: {data.state}
+                    ⚠️ {data.friendly_name}
+                    {data.state != "on" ? ":" : ""}{" "}
+                    {data.state != "on" ? data.state : ""}
                     {data.unit_of_measurement} —{" "}
                     {new Date(data.timestamp).toLocaleString()}
                   </Typography>
