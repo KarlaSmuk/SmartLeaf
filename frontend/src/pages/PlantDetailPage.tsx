@@ -22,7 +22,6 @@ function PlantDetailPage() {
   const navigate = useNavigate();
 
   useHomeAssistantWebSocket((entity_id, state) => {
-    console.log("🌡️ Received threshold update:", entity_id, state);
     if (entity_id.includes("moisture")) {
       setMoistureThreshold(parseFloat(state));
     } else if (entity_id.includes("temperature_min")) {

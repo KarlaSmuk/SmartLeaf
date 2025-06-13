@@ -60,7 +60,6 @@ app.post("/mock-alert", (req, res) => {
       webpush.sendNotification(sub, JSON.stringify(alert)).catch(console.error);
     });
   }
-  console.log("Simulated alert sent:", alert);
   res.json({ message: "Simulated alert sent", alert });
 });
 
@@ -102,7 +101,7 @@ haWs.on("message", (raw) => {
       const timestamp = new_state.last_updated;
       const friendly_name = new_state.attributes.friendly_name;
       const unit_of_measurement = new_state.attributes.unit_of_measurement;
-      console.log(entity_id);
+
       let alert = {
         type: "sensor_reading",
         data: {

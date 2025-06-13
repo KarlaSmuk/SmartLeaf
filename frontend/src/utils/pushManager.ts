@@ -1,4 +1,4 @@
-const VAPID_PUBLIC_KEY = 'BB-EfsxzJhl7O5_JOBVM1L-jxKLdyLOlthGOZu6Rko4c55Tl9FaEb--Ji84gkvWqUF7-M0ISFwzWC-m-MxVWuoY';
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY;
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -27,6 +27,6 @@ export async function subscribeToPushNotifications(
         userVisibleOnly: true,
         applicationServerKey,
     });
-    
+
     return subscription;
 }
