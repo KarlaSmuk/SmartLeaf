@@ -1,0 +1,126 @@
+views:
+  - title: Plant Monitor
+    path: plant-monitor
+    icon: mdi:sprout
+    cards:
+      - type: markdown
+        content: |
+          #  SmartLeaf Plant Monitoring
+      - type: grid
+        columns: 1
+        square: false
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: '## Plant 1'
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    name: Leaf Moisture
+                    entity: sensor.plant_1_moisture
+                    min: 0
+                    max: 100
+                    severity:
+                      green: 30
+                      yellow: 20
+                      red: 0
+                  - type: gauge
+                    name: Temperature
+                    entity: sensor.plant_1_temperature
+                    min: 0
+                    max: 40
+                    severity:
+                      green: 25
+                      yellow: 28
+                      red: 30
+                  - type: gauge
+                    name: Air Pressure
+                    entity: sensor.plant_1_air_pressure
+                    min: 900
+                    max: 1100
+                    severity:
+                      orange: 1100
+                      green: 1000
+                      yellow: 900
+              - type: entities
+                entities:
+                  - input_text.automatic_water
+              - type: entities
+                title: Threshold Settings
+                entities:
+                  - input_number.plant_1_moisture_threshold
+                  - input_number.plant_1_temperature_min_threshold
+                  - input_number.plant_1_temperature_max_threshold
+              - type: history-graph
+                title: 24h History
+                hours_to_show: 24
+                refresh_interval: 0
+                entities:
+                  - sensor.plant_1_moisture
+                  - sensor.plant_1_temperature
+              - type: glance
+                title: Quick Status
+                columns: 2
+                entities:
+                  - entity: sensor.plant_1_moisture
+                    icon: mdi:water-percent
+                  - entity: sensor.plant_1_temperature
+                    icon: mdi:thermometer
+          - type: vertical-stack
+            cards:
+              - type: markdown
+                content: '## Plant 2'
+              - type: horizontal-stack
+                cards:
+                  - type: gauge
+                    name: Leaf Moisture
+                    entity: sensor.plant_2_moisture
+                    min: 0
+                    max: 100
+                    severity:
+                      green: 30
+                      yellow: 20
+                      red: 0
+                  - type: gauge
+                    name: Temperature
+                    entity: sensor.plant_2_temperature
+                    min: 0
+                    max: 40
+                    severity:
+                      green: 25
+                      yellow: 28
+                      red: 30
+                  - type: gauge
+                    name: Air Pressure
+                    entity: sensor.plant_2_air_pressure
+                    min: 900
+                    max: 1100
+                    severity:
+                      orange: 1100
+                      green: 1000
+                      yellow: 900
+              - type: entities
+                entities:
+                  - input_text.automatic_water_2
+              - type: entities
+                title: Threshold Settings
+                entities:
+                  - input_number.plant_2_moisture_threshold
+                  - input_number.plant_2_temperature_min_threshold
+                  - input_number.plant_2_temperature_max_threshold
+              - type: history-graph
+                title: 24h History
+                hours_to_show: 24
+                refresh_interval: 0
+                entities:
+                  - sensor.plant_2_moisture
+                  - sensor.plant_2_temperature
+              - type: glance
+                title: Quick Status
+                columns: 2
+                entities:
+                  - entity: sensor.plant_2_moisture
+                    icon: mdi:water-percent
+                  - entity: sensor.plant_2_temperature
+                    icon: mdi:thermometer

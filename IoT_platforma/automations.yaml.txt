@@ -1,0 +1,165 @@
+- alias: Plant 1 - Temperature too high!!
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.plant_1_temperature
+    above: input_number.plant_1_temperature_max_threshold
+  action:
+  - service: notify.web_app_notification
+    data:
+      message: 'Alert: Plant 1 temperature too high ({{ states(''sensor.plant_1_temperature'')
+        }}°C)'
+      data:
+        alert_type: high_temp
+        plant_id: 1
+        current_value: '{{ states(''sensor.plant_1_temperature'') }}'
+        threshold: '{{ states(''input_number.plant1_temperature_max_threshold'') }}'
+  id: e930d750b08347e6a99164dc0e209cf2
+- alias: Plant 1 - Temperature too low
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.plant_1_temperature
+    below: input_number.plant_1_temperature_min_threshold
+  action:
+  - service: notify.web_app_notification
+    data:
+      message: 'Alert: Plant 1 temperature too low ({{ states(''sensor.plant_1_temperature'')
+        }}°C)'
+      data:
+        alert_type: low_temp
+        plant_id: 1
+        current_value: '{{ states(''sensor.plant_1_temperature'') }}'
+        threshold: '{{ states(''input_number.plant1_temperature_min_threshold'') }}'
+  id: 58c4286bfa934084be30ece410aa3cc9
+- alias: Plant 1 - Moisture too low!!
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.plant_1_moisture
+    below: input_number.plant_1_moisture_threshold
+  action:
+  - service: script.water_plant_1
+  - service: notify.web_app_notification
+    data:
+      message: 'Alert: Plant 1 moisture too low ({{ states(''sensor.plant_1_moisture'')
+        }}%) - Automatic watering initiated'
+      data:
+        alert_type: low_moisture
+        plant_id: 1
+        current_value: '{{ states(''sensor.plant_1_moisture'') }}'
+        threshold: '{{ states(''input_number.plant1_moisture_threshold'') }}'
+        action_taken: automatic_watering
+  id: ef2cf221f69b4da4b9ef290ffce299fb
+- alias: Plant 2 - Temperature too high!!
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.plant_2_temperature
+    above: input_number.plant_2_temperature_max_threshold
+  action:
+  - service: notify.web_app_notification
+    data:
+      message: 'Alert: Plant 2 temperature too high ({{ states(''sensor.plant_2_temperature'')
+        }}°C)'
+      data:
+        alert_type: high_temp
+        plant_id: 2
+        current_value: '{{ states(''sensor.plant_2_temperature'') }}'
+        threshold: '{{ states(''input_number.plant2_temperature_max_threshold'') }}'
+  id: 6c69f260e2d94efd88a30999fe87be6c
+- alias: Plant 2 - Temperature too low!!
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.plant_2_temperature
+    below: input_number.plant_2_temperature_min_threshold
+  action:
+  - service: notify.web_app_notification
+    data:
+      message: 'Alert: Plant 2 temperature too low ({{ states(''sensor.plant_2_temperature'')
+        }}°C)'
+      data:
+        alert_type: low_temp
+        plant_id: 2
+        current_value: '{{ states(''sensor.plant_2_temperature'') }}'
+        threshold: '{{ states(''input_number.plant2_temperature_min_threshold'') }}'
+  id: 1e0b8fd2624d4898b68f80b63eb28713
+- alias: Plant 2 - Moisture too low!!
+  trigger:
+    platform: numeric_state
+    entity_id: sensor.plant_2_moisture
+    below: input_number.plant_2_moisture_threshold
+  action:
+  - service: script.water_plant_2
+  - service: notify.web_app_notification
+    data:
+      message: 'Alert: Plant 2 moisture too low ({{ states(''sensor.plant_2_moisture'')
+        }}%) - Automatic watering initiated'
+      data:
+        alert_type: low_moisture
+        plant_id: 2
+        current_value: '{{ states(''sensor.plant_2_moisture'') }}'
+        threshold: '{{ states(''input_number.plant2_moisture_threshold'') }}'
+        action_taken: automatic_watering
+  id: 4bde2fcf3b2543d28a1f389eb9ab91db
+- id: '1749660673778'
+  alias: Automatic Watering
+  description: ''
+  triggers:
+  - entity_id:
+    - input_number.plant_watering_start
+    trigger: numeric_state
+    above: 0
+  conditions: []
+  actions:
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: Watering plant in progress...
+    target:
+      entity_id: input_text.automatic_water
+  - delay:
+      seconds: '{{ states(''input_number.plant_watering_time'') | float }}'
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: Finished watering plant!
+    target:
+      entity_id: input_text.automatic_water
+  - action: input_number.set_value
+    metadata: {}
+    data:
+      value: 0
+    target:
+      entity_id: input_number.plant_watering_start
+  mode: single
+- id: '1749665157438'
+  alias: Automatic watering 2
+  description: ''
+  triggers:
+  - entity_id:
+    - input_number.plant_2_watering_start
+    trigger: numeric_state
+    above: 0
+  conditions: []
+  actions:
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: Watering plant in progress...
+    target:
+      entity_id:
+      - input_text.automatic_water_2
+  - delay:
+      seconds: '{{ states(''input_number.plant_watering_time'') | float }}'
+  - action: input_text.set_value
+    metadata: {}
+    data:
+      value: Finished watering plant!!
+    target:
+      entity_id:
+      - input_text.automatic_water_2
+  - action: input_number.set_value
+    metadata: {}
+    data:
+      value: 0
+    target:
+      entity_id:
+      - input_number.plant_2_watering_start
+  mode: single
